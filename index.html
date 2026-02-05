@@ -1,143 +1,111 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enterprise | Premium Custom Keychains</title>
-    <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enterprise Keychain</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-    <nav class="glass-nav">
-        <div class="nav-content">
-            <span class="logo">ENTERPRISE<span class="dot">.</span></span>
-            <div class="nav-links">
-                <a href="#hero">Product</a>
-                <a href="#specs">Details</a>
-                <button onclick="scrollToSection('order')" class="nav-btn">Buy Now</button>
-            </div>
-        </div>
-    </nav>
-
-    <section id="hero" class="snap-section">
-        <div class="hero-content reveal">
-            <span class="pill-badge">IGCSE Enterprise Project</span>
-            <h1>The Keychain, <span class="gradient-text">Perfected.</span></h1>
-            <p class="subtitle">Minimalist engineering meets personal expression. A high-clarity acrylic canvas for your memories. Only 4 AED.</p>
-            <div class="cta-group">
-                <button onclick="scrollToSection('order')" class="primary-btn">Start Your Order</button>
-                <button onclick="scrollToSection('specs')" class="secondary-btn">View Specs</button>
-            </div>
-        </div>
-        <div class="hero-visual reveal delay-1">
-            <div class="floating-keychain">
-                <div class="keychain-inner"><span>3cm x 4.78cm</span></div>
-                <div class="keychain-ring"></div>
-            </div>
-        </div>
-    </section>
-
-    <section id="specs" class="snap-section dark-mode">
-        <div class="specs-header reveal">
-            <h2>Technical Precision</h2>
-            <p>Every detail calculated for the perfect everyday carry.</p>
-        </div>
-        <div class="grid-layout">
-            <div class="feature-card reveal delay-1">
-                <div class="icon">📏</div>
-                <h3>Exact Dimensions</h3>
-                <p>3cm width and 4.78cm height. Slim enough for pockets, large enough for crystal clear detail.</p>
-            </div>
-            <div class="feature-card reveal delay-2">
-                <div class="icon">🎨</div>
-                <h3>Fully Custom</h3>
-                <p>Upload any photo for the front and back. We use high-definition protection sheets.</p>
-            </div>
-            <div class="feature-card reveal delay-3">
-                <div class="icon">💎</div>
-                <h3>Premium Build</h3>
-                <p>Crystal clear acrylic casing that is shatter-resistant and incredibly lightweight.</p>
-            </div>
-        </div>
-    </section>
-
-    <section id="order" class="snap-section">
-        <div class="order-container reveal">
-            <div class="form-header">
-                <h2>Customization Lab</h2>
-                <p>Upload your photos and enter your delivery info.</p>
-            </div>
-            
-            <form id="orderForm" class="glass-form">
-                <div class="form-grid">
-                    <div class="input-group">
-                        <label>Email (Valid Format Required)</label>
-                        <input type="email" id="email" required placeholder="name@example.com">
-                    </div>
-                    <div class="input-group">
-                        <label>Phone Number (Optional)</label>
-                        <input type="tel" id="phone" placeholder="+971 -- --- ----">
-                    </div>
-                </div>
-
-                <div class="form-grid">
-                    <div class="input-group">
-                        <label>Quantity (Max 10)</label>
-                        <input type="number" id="quantity" min="1" max="10" value="1" onchange="updatePrice()">
-                    </div>
-                    <div class="input-group">
-                        <label>Promo Code</label>
-                        <div class="promo-row">
-                            <input type="text" id="promo" placeholder="CODE">
-                            <button type="button" onclick="checkPromo()" class="small-btn">Apply</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="file-upload-section">
-                    <div class="file-box">
-                        <label>Front Image</label>
-                        <input type="file" id="front-file" accept="image/*" required>
-                    </div>
-                    <div class="file-box">
-                        <label>Back Image</label>
-                        <input type="file" id="back-file" accept="image/*" required>
-                    </div>
-                </div>
-
-                <div class="price-dock">
-                    <div class="price-row">
-                        <span>Total Price</span>
-                        <span id="final-price" class="big-price">4.00 AED</span>
-                    </div>
-                    <button type="submit" id="submit-btn" class="buy-btn">
-                        <span id="btn-text">Pay & Order Now</span>
-                        <div id="loader" class="spinner hidden"></div>
-                    </button>
-                    <p id="error-msg" class="error-text"></p>
-                </div>
-            </form>
-        </div>
-    </section>
-
-    <div id="receipt-modal" class="modal hidden">
-        <div class="modal-content">
-            <div class="success-icon">✓</div>
-            <h3>Order Received!</h3>
-            <div class="receipt-card">
-                <div class="r-row"><span>Order #:</span> <span id="r-id"></span></div>
-                <div class="r-row"><span>Quantity:</span> <span id="r-qty"></span></div>
-                <div class="r-row total"><span>Total:</span> <span id="r-total"></span></div>
-            </div>
-            <button onclick="downloadReceipt()" class="primary-btn full">Download PDF Receipt</button>
-            <button onclick="window.location.reload()" class="link-btn">Back to Store</button>
-        </div>
+  <header class="site-header">
+    <div class="container nav-wrap">
+      <div class="brand">Enterprise</div>
+      <nav>
+        <a href="#product" class="nav-link">Product</a>
+        <a href="#order" class="nav-link">Order</a>
+      </nav>
     </div>
+  </header>
 
-    <script src="script.js"></script>
+  <main>
+    <section id="product" class="hero">
+      <div class="container hero-grid">
+        <div>
+          <p class="eyebrow">IGCSE Enterprise Project</p>
+          <h1>Custom Keychain.<br>Simple. Personal. Apple‑inspired.</h1>
+          <p class="lead">Your design on both sides of a premium acrylic keychain. Size: 3 × 4.78 cm. Price: 4 AED each.</p>
+          <button class="primary-btn" data-scroll="order">Order now</button>
+        </div>
+        <div class="product-card">
+          <div class="keychain">
+            <div class="ring"></div>
+            <div class="plate"></div>
+          </div>
+          <p>Upload front + back photos</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="order" class="order">
+      <div class="container">
+        <h2>Place your order</h2>
+        <form id="order-form" class="order-form">
+          <div class="row">
+            <label>Email
+              <input type="email" id="customer-email" required placeholder="you@example.com">
+            </label>
+            <label>Phone (optional)
+              <input type="tel" id="customer-phone" placeholder="+971 50 000 0000">
+            </label>
+          </div>
+
+          <div class="row">
+            <label>Quantity (1–10)
+              <input type="number" id="item-quantity" min="1" max="10" value="1" required>
+            </label>
+            <label>Promo code
+              <div class="promo-wrap">
+                <input type="text" id="promo-code" placeholder="PROMO">
+                <button type="button" id="apply-promo-btn" class="secondary-btn">Apply</button>
+              </div>
+              <small id="promo-message"></small>
+            </label>
+          </div>
+
+          <div class="row">
+            <label>Front photo
+              <input type="file" id="front-photo" accept="image/*" required>
+            </label>
+            <label>Back photo
+              <input type="file" id="back-photo" accept="image/*" required>
+            </label>
+          </div>
+
+          <div class="summary">
+            <p><span>Base</span><span id="base-total">4.00 AED</span></p>
+            <p><span>Discount</span><span id="discount-total">-0.00 AED</span></p>
+            <p class="total"><span>Total</span><span id="total-price">4.00 AED</span></p>
+          </div>
+
+          <button type="submit" class="primary-btn full" id="submit-btn">Place order</button>
+          <p id="form-error" class="error"></p>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <div id="receipt-modal" class="modal" aria-hidden="true">
+    <div class="modal-card">
+      <button class="close-btn" aria-label="Close">×</button>
+      <h3>Order confirmed</h3>
+      <p class="receipt-id">Order #<span id="receipt-order-id"></span></p>
+      <div class="receipt-grid">
+        <p><span>Email</span><span id="receipt-email"></span></p>
+        <p><span>Phone</span><span id="receipt-phone"></span></p>
+        <p><span>Quantity</span><span id="receipt-quantity"></span></p>
+        <p><span>Promo</span><span id="receipt-promo"></span></p>
+        <p class="total"><span>Total</span><span id="receipt-total"></span></p>
+      </div>
+      <button id="download-pdf" class="secondary-btn">Download receipt PDF</button>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
