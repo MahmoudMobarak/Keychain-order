@@ -14,52 +14,78 @@ const EMAILJS_TEMPLATE_CUSTOMER = "template_hu5h00o";
 const EMAILJS_TEMPLATE_ADMIN = "template_i0rlm7u";
 
 /*************************************************
- * 2. SETUP CLIENTS / CONSTANTS
+ * 1. CONFIG – FILL THESE IN
  *************************************************/
+const SUPABASE_URL = "https://pkzvftleoysldqmjdgds.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_H9QIgdBqQZtHXcywZyDsjA_s4fXffjN";
+const EMAILJS_SERVICE_ID = "service_zlh57wd";
+const EMAILJS_TEMPLATE_CUSTOMER = "template_hu5h00o";
+const EMAILJS_TEMPLATE_ADMIN = "template_i0rlm7u";
 
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-const PRICE_PER_ITEM = 4; // AED
+const PRICE_PER_ITEM = 4;
 
 /*************************************************
- * 3. HELPER FUNCTIONS
+ * 2. SCROLL ANIMATIONS + BUTTON FIXES
  *************************************************/
-
-// Simple email regex
-function isValidEmail(email) {
-  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return re.test(email);
+function smoothScrollTo(targetId) {
+  const target = document.getElementById(targetId);
+  if (target) {
+    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
 }
 
-/*************************************************
- * 4. NAVIGATION (SWITCH PAGES)
- *************************************************/
-
-document.querySelectorAll(".nav-btn").forEach(btn => {
-  btn.addEventListener("click", () => {
-    const targetId = btn.getAttribute("data-target");
-    if (!targetId) return;
-    document.querySelectorAll(".page-section").forEach(sec => {
-      sec.classList.toggle("active", sec.id === targetId);
+// Fix ALL "Order Now" and "Customize" buttons
+document.addEventListener('DOMContentLoaded', function() {
+  // Navigation links
+  document.querySelectorAll('.nav-link').forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      const targetId = link.getAttribute('href').substring(1);
+      smoothScrollTo(targetId);
     });
   });
-});
 
-// Any “Order now” button
-document.querySelectorAll("button[data-target='order-section']").forEach(btn => {
-  btn.addEventListener("click", () => {
-    document.querySelectorAll(".page-section").forEach(sec => {
-      sec.classList.toggle("active", sec.id === "order-section");
+  // All CTA buttons
+  document.querySelectorAll('[data-scroll]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const targetId = btn.getAttribute('data-scroll');
+      smoothScrollTo(targetId);
     });
   });
+
+  // Animate feature cards on scroll
+  const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -100px 0px'
+  };
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const card = entry.target;
+        const animation = card.getAttribute('data-animation') || 'slide';
+        card.classList.add('animate-' + animation);
+      }
+    });
+  }, observerOptions);
+
+  document.querySelectorAll('.feature-card').forEach(card => {
+    observer.observe(card);
+  });
+
+  // Initial price calculation
+  updateTotal();
 });
 
 /*************************************************
- * 5. PRICE + PROMO CODE LOGIC
+ * 3. PRICE + PROMO LOGIC
  *************************************************/
-
 const qtyInput = document.getElementById("item-quantity");
 const totalPriceText = document.getElementById("total-price");
+const baseTotalText = document.getElementById("base-total");
+const discountTotalText = document.getElementById("discount-total");
 const promoInput = document.getElementById("promo-code");
 const promoMessage = document.getElementById("promo-message");
 
@@ -68,74 +94,79 @@ let appliedPromo = null;
 function updateTotal() {
   const qty = Math.min(Math.max(parseInt(qtyInput.value || "1", 10), 1), 10);
   qtyInput.value = qty;
-  let baseTotal = qty * PRICE_PER_ITEM;
+  
+  const baseTotal = qty * PRICE_PER_ITEM;
   let discount = 0;
 
   if (appliedPromo) {
     if (appliedPromo.discount_type === "percent") {
       discount = (baseTotal * appliedPromo.discount_value) / 100;
-    } else if (appliedPromo.discount_type === "fixed") {
+    } else {
       discount = appliedPromo.discount_value;
     }
-    if (discount > baseTotal) discount = baseTotal;
+    discount = Math.min(discount, baseTotal);
   }
 
   const finalTotal = baseTotal - discount;
-  totalPriceText.textContent = `Total: ${finalTotal.toFixed(2)} AED`;
+  
+  baseTotalText.textContent = `${baseTotal.toFixed(2)} AED`;
+  discountTotalText.textContent = `-${discount.toFixed(2)} AED`;
+  totalPriceText.textContent = `${finalTotal.toFixed(2)} AED`;
+  
   return { qty, baseTotal, discount, finalTotal };
 }
 
 qtyInput.addEventListener("input", updateTotal);
 
-// Apply promo code (reads from Supabase table promo_codes)
 document.getElementById("apply-promo-btn").addEventListener("click", async () => {
   const code = promoInput.value.trim();
   appliedPromo = null;
   promoMessage.textContent = "";
+  promoMessage.className = "";
 
   if (!code) {
-    promoMessage.textContent = "No promo code entered.";
+    promoMessage.textContent = "Enter promo code";
     return;
   }
 
-  const { data, error } = await supabaseClient
-    .from("promo_codes")
-    .select("*")
-    .eq("code", code)
-    .eq("active", true)
-    .maybeSingle();
+  try {
+    const { data, error } = await supabaseClient
+      .from("promo_codes")
+      .select("*")
+      .eq("code", code)
+      .eq("active", true)
+      .maybeSingle();
 
-  if (error || !data) {
-    promoMessage.textContent = "Promo code not valid.";
-  } else {
-    appliedPromo = data;
-    promoMessage.textContent = `Promo applied: ${data.description} (${data.discount_type} ${data.discount_value})`;
-    updateTotal();
+    if (error || !data) {
+      promoMessage.textContent = "Invalid promo code";
+      promoMessage.className = "error";
+    } else {
+      appliedPromo = data;
+      promoMessage.textContent = `✓ ${data.description}`;
+      promoMessage.className = "success";
+      updateTotal();
+    }
+  } catch (err) {
+    promoMessage.textContent = "Error checking code";
+    promoMessage.className = "error";
   }
 });
 
 /*************************************************
- * 6. FILE UPLOAD TO SUPABASE STORAGE
+ * 4. SUPABASE UPLOAD + ORDER
  *************************************************/
-
 async function uploadPhoto(file, folder) {
   const fileExt = file.name.split(".").pop();
-  const fileName = `${folder}/${Date.now()}-${Math.random()
-    .toString(36)
-    .slice(2)}.${fileExt}`;
-
+  const fileName = `${folder}/${Date.now()}-${Math.random().toString(36).slice(2)}.${fileExt}`;
+  
   const { data, error } = await supabaseClient
     .storage
-    .from("order-photos") // bucket name
+    .from("order-photos")
     .upload(fileName, file);
 
   if (error) throw error;
-  return data.path; // stored path
+  return data.path;
 }
-
-/*************************************************
- * 7. FORM SUBMIT + SAVE ORDER + SEND EMAILS
- *************************************************/
 
 const orderForm = document.getElementById("order-form");
 const formError = document.getElementById("form-error");
@@ -143,6 +174,7 @@ const formError = document.getElementById("form-error");
 orderForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   formError.textContent = "";
+  formError.className = "";
 
   const name = document.getElementById("customer-name").value.trim();
   const email = document.getElementById("customer-email").value.trim();
@@ -150,16 +182,9 @@ orderForm.addEventListener("submit", async (e) => {
   const frontFile = document.getElementById("front-photo").files[0];
   const backFile = document.getElementById("back-photo").files[0];
 
-  if (!name) {
-    formError.textContent = "Please enter your name.";
-    return;
-  }
-  if (!isValidEmail(email)) {
-    formError.textContent = "Please enter a valid email.";
-    return;
-  }
-  if (!frontFile || !backFile) {
-    formError.textContent = "Please upload both front and back photos.";
+  if (!name || !email || !frontFile || !backFile) {
+    formError.textContent = "Please fill all required fields";
+    formError.className = "error";
     return;
   }
 
@@ -167,13 +192,16 @@ orderForm.addEventListener("submit", async (e) => {
   const promoCode = appliedPromo ? appliedPromo.code : null;
 
   try {
-    // 1) Upload images
+    // Show loading
+    orderForm.querySelector('.cta-primary').textContent = "Processing...";
+    
+    // Upload photos
     const frontPath = await uploadPhoto(frontFile, "front");
     const backPath = await uploadPhoto(backFile, "back");
 
-    // 2) Insert order in Supabase
+    // Save order
     const orderPayload = {
-      customer_name: name,      // make sure this column exists in your orders table
+      customer_name: name,
       customer_email: email,
       phone: phone || null,
       items: [{ quantity: qty, unit_price: PRICE_PER_ITEM }],
@@ -184,7 +212,7 @@ orderForm.addEventListener("submit", async (e) => {
       back_photo_path: backPath
     };
 
-    const { data, error } = await supabaseClient
+    const { data: order, error } = await supabaseClient
       .from("orders")
       .insert(orderPayload)
       .select()
@@ -192,92 +220,101 @@ orderForm.addEventListener("submit", async (e) => {
 
     if (error) throw error;
 
-    // 3) Send emails via EmailJS
-    await sendEmailsWithEmailJS(data);
+    // Send emails
+    await sendEmailsWithEmailJS(order);
 
-    // 4) Show receipt
-    showReceiptModal(data);
+    // Show receipt
+    showReceiptModal(order);
+    orderForm.reset();
+    updateTotal();
 
   } catch (err) {
     console.error(err);
-    formError.textContent = "Something went wrong. Please try again.";
+    formError.textContent = "Order failed. Try again.";
+    formError.className = "error";
+  } finally {
+    orderForm.querySelector('.cta-primary').textContent = "Place Order";
   }
 });
 
 /*************************************************
- * 8. EMAILJS – SEND CUSTOMER + ADMIN EMAILS
+ * 5. EMAILJS
  *************************************************/
-
 async function sendEmailsWithEmailJS(order) {
-  const qty = order.items && order.items[0] ? order.items[0].quantity : "?";
+  const qty = order.items[0]?.quantity || 1;
 
-  // Customer email
-  await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_CUSTOMER, {
-    to_name: order.customer_name,
-    order_id: order.id,
-    quantity: qty,
-    total_price: order.total_price_aed.toFixed(2)
-  });
+  try {
+    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_CUSTOMER, {
+      to_name: order.customer_name,
+      order_id: order.id,
+      quantity: qty,
+      total_price: order.total_price_aed.toFixed(2)
+    });
 
-  // Admin email
-  await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ADMIN, {
-    order_id: order.id,
-    customer_name: order.customer_name,
-    customer_email: order.customer_email,
-    customer_phone: order.phone || "-",
-    quantity: qty,
-    total_price: order.total_price_aed.toFixed(2),
-    promo_code: order.promo_code || "-"
-  });
+    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ADMIN, {
+      order_id: order.id,
+      customer_name: order.customer_name,
+      customer_email: order.customer_email,
+      customer_phone: order.phone || "-",
+      quantity: qty,
+      total_price: order.total_price_aed.toFixed(2),
+      promo_code: order.promo_code || "-"
+    });
+  } catch (error) {
+    console.error("Email failed:", error);
+  }
 }
 
 /*************************************************
- * 9. RECEIPT MODAL + PDF DOWNLOAD
+ * 6. RECEIPT MODAL (NOW WORKS!)
  *************************************************/
-
 const receiptModal = document.getElementById("receipt-modal");
-const closeReceiptBtn = document.getElementById("close-receipt");
-const downloadPdfBtn = document.getElementById("download-pdf-btn");
+const closeReceiptBtn = document.querySelector(".modal-close");
+const downloadPdfBtn = document.getElementById("download-pdf");
 
 function showReceiptModal(order) {
   document.getElementById("receipt-order-id").textContent = order.id;
   document.getElementById("receipt-name").textContent = order.customer_name;
   document.getElementById("receipt-email").textContent = order.customer_email;
   document.getElementById("receipt-phone").textContent = order.phone || "-";
-
-  const qty = order.items && order.items[0] ? order.items[0].quantity : "?";
-  document.getElementById("receipt-quantity").textContent = qty;
+  document.getElementById("receipt-quantity").textContent = order.items[0]?.quantity || "?";
   document.getElementById("receipt-promo").textContent = order.promo_code || "-";
-  document.getElementById("receipt-discount").textContent = (order.discount_amount || 0).toFixed(2);
-  document.getElementById("receipt-total").textContent = order.total_price_aed.toFixed(2);
-
-  receiptModal.classList.remove("hidden");
+  document.getElementById("receipt-total").textContent = `${order.total_price_aed.toFixed(2)} AED`;
+  
+  receiptModal.classList.add("show");
 }
 
 closeReceiptBtn.addEventListener("click", () => {
-  receiptModal.classList.add("hidden");
+  receiptModal.classList.remove("show");
 });
 
-// jsPDF is loaded via CDN in index.html (window.jspdf)
+receiptModal.addEventListener("click", (e) => {
+  if (e.target === receiptModal) {
+    receiptModal.classList.remove("show");
+  }
+});
+
 downloadPdfBtn.addEventListener("click", () => {
   if (!window.jspdf) {
-    alert("PDF library still loading, please try again.");
+    alert("PDF loading...");
     return;
   }
+  
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
-
+  
   const orderId = document.getElementById("receipt-order-id").textContent;
   const name = document.getElementById("receipt-name").textContent;
   const email = document.getElementById("receipt-email").textContent;
-  const phone = document.getElementById("receipt-phone").textContent;
-  const qty = document.getElementById("receipt-quantity").textContent;
-  const promo = document.getElementById("receipt-promo").textContent;
-  const discount = document.getElementById("receipt-discount").textContent;
   const total = document.getElementById("receipt-total").textContent;
 
-  let y = 20;
+  doc.setFontSize(20);
+  doc.text("Order Receipt", 20, 30);
   doc.setFontSize(16);
-  doc.text("Order receipt", 20, y);
-  y += 10;
-  doc.setFontSize(
+  doc.text(`Order #${orderId}`, 20, 50);
+  doc.text(`Name: ${name}`, 20, 70);
+  doc.text(`Email: ${email}`, 20, 90);
+  doc.text(`Total: ${total}`, 20, 120);
+  
+  doc.save(`receipt-${orderId}.pdf`);
+});
