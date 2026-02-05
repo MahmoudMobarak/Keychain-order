@@ -1,336 +1,144 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Enterprise Keychain</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: 'SF Pro Display', -apple-system, sans-serif;
-      background: #000;
-      color: white;
-      line-height: 1.5;
-      overflow-x: hidden;
-    }
-    .header {
-      position: fixed; top: 0; width: 100%; padding: 1rem 2rem;
-      backdrop-filter: blur(20px); background: rgba(0,0,0,0.8);
-      z-index: 1000;
-    }
-    .nav { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
-    .logo { font-size: 1.5rem; font-weight: 600; }
-    .nav-links { display: flex; gap: 2rem; }
-    .nav-link { color: #ccc; text-decoration: none; font-weight: 500; }
-    .nav-link:hover { color: white; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minimalist Keychain | Enterprise</title>
     
-    .hero { 
-      height: 100vh; display: flex; align-items: center; justify-content: center; 
-      text-align: center; background: linear-gradient(135deg, #000 0%, #1a1a2e 100%);
-    }
-    .hero h1 { font-size: clamp(4rem, 10vw, 8rem); font-weight: 300; margin: 0 0 1rem 0; }
-    .hero p { font-size: 1.5rem; margin-bottom: 3rem; opacity: 0.9; }
-    .hero-stats { display: flex; gap: 4rem; justify-content: center; margin-bottom: 4rem; }
-    .stat-number { display: block; font-size: 3rem; font-weight: 300; }
-    .stat-label { opacity: 0.8; font-size: 1rem; }
-    
-    .cta-primary {
-      background: #007AFF; color: white; border: none;
-      padding: 1.2rem 3rem; font-size: 1.2rem; font-weight: 500;
-      border-radius: 50px; cursor: pointer; transition: all 0.3s;
-    }
-    .cta-primary:hover { background: #0056cc; transform: translateY(-3px); }
-    
-    section { padding: 6rem 2rem; max-width: 1200px; margin: 0 auto; }
-    .section-title { font-size: 3rem; text-align: center; margin-bottom: 3rem; font-weight: 300; }
-    
-    .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
-    .feature-card {
-      background: rgba(255,255,255,0.05); padding: 2rem; border-radius: 20px;
-      text-align: center; border: 1px solid rgba(255,255,255,0.1);
-      transition: all 0.4s; cursor: pointer;
-    }
-    .feature-card:hover { transform: translateY(-10px); background: rgba(255,255,255,0.1); }
-    .feature-icon { font-size: 4rem; margin-bottom: 1rem; }
-    
-    .product-showcase { 
-      display: flex; gap: 4rem; align-items: center; flex-wrap: wrap;
-      background: #111; border-radius: 30px; padding: 4rem; margin: 4rem 0;
-    }
-    .keychain-mockup { 
-      width: 120px; height: 180px; background: #333; border-radius: 10px; 
-      margin: 0 auto 1rem; animation: float 3s ease-in-out infinite;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    }
-    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-    
-    .order-form { max-width: 800px; margin: 0 auto; }
-    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem; }
-    .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
-    .form-group input, .form-group input[type="file"] {
-      width: 100%; padding: 1rem; background: #222; border: 1px solid #444;
-      border-radius: 12px; color: white; font-size: 1rem;
-    }
-    .promo-input { display: flex; gap: 1rem; }
-    .btn-promo { 
-      background: #007AFF; color: white; border: none; padding: 1rem 1.5rem;
-      border-radius: 12px; cursor: pointer; font-weight: 500;
-    }
-    .order-summary {
-      background: #222; padding: 2rem; border-radius: 16px; margin: 2rem 0;
-      display: flex; justify-content: space-between; flex-direction: column;
-    }
-    .summary-row { display: flex; justify-content: space-between; margin-bottom: 1rem; }
-    .summary-row.total { font-size: 1.5rem; font-weight: 600; border-top: 1px solid #444; padding-top: 1rem; }
-    
-    .modal-overlay {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none;
-      align-items: center; justify-content: center; z-index: 9999;
-    }
-    .modal-overlay.show { display: flex; }
-    .modal-content {
-      background: #111; padding: 3rem; border-radius: 24px; max-width: 500px;
-      width: 90%; border: 1px solid #444;
-    }
-    .modal-close { position: absolute; top: 1rem; right: 1.5rem; background: none; border: none; font-size: 2rem; color: #ccc; cursor: pointer; }
-    .receipt-header { text-align: center; margin-bottom: 2rem; }
-    .order-number { background: #007AFF; color: white; padding: 0.5rem 1rem; border-radius: 20px; display: inline-block; }
-    .detail-row { display: flex; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid #444; }
-    .detail-row:last-child { border-bottom: none; }
-    
-    .error { color: #ff4444; text-align: center; margin-top: 1rem; }
-    .success { color: #44ff44; }
-    
-    @media (max-width: 768px) {
-      .form-row, .hero-stats { grid-template-columns: 1fr; flex-direction: column; gap: 1rem; }
-      .product-showcase { flex-direction: column; text-align: center; }
-      .nav-links { display: none; }
-    }
-  </style>
+    <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
-  <header class="header">
-    <nav class="nav">
-      <div class="logo">Enterprise Keychain</div>
-      <div class="nav-links">
-        <a href="#hero" class="nav-link active">Home</a>
-        <a href="#product" class="nav-link">Product</a>
-        <a href="#order" class="nav-link">Order</a>
-      </div>
+
+    <nav class="glass-nav">
+        <div class="nav-content">
+            <span class="logo">Enterprise.</span>
+            <div class="nav-links">
+                <a href="#hero">Overview</a>
+                <a href="#specs">Specs</a>
+                <button onclick="scrollToSection('order')" class="nav-btn">Buy</button>
+            </div>
+        </div>
     </nav>
-  </header>
 
-  <section id="hero" class="hero">
-    <div>
-      <h1>Minimalist Keychain</h1>
-      <p>Custom front & back design. 3 × 4.78cm. Only 4 AED.</p>
-      <div class="hero-stats">
-        <div class="stat"><span class="stat-number">3 × 4.78</span><span class="stat-label">CM</span></div>
-        <div class="stat"><span class="stat-number">4</span><span class="stat-label">AED</span></div>
-        <div class="stat"><span class="stat-number">10</span><span class="stat-label">Max</span></div>
-      </div>
-      <button class="cta-primary" onclick="scrollTo('order')">Order Now</button>
+    <section id="hero" class="snap-section">
+        <div class="hero-content fade-in">
+            <span class="pill-badge">IGCSE Project</span>
+            <h1>The Keychain.<br>Reimagined.</h1>
+            <p class="subtitle">Minimalist design. Maximum identity. 4 AED.</p>
+            <div class="cta-group">
+                <button onclick="scrollToSection('order')" class="primary-btn">Order Now</button>
+                <a href="#specs" class="link-btn">Learn more ></a>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <div class="floating-keychain">
+                <div class="keychain-body"></div>
+                <div class="keychain-ring"></div>
+            </div>
+        </div>
+    </section>
+
+    <section id="specs" class="snap-section dark-mode">
+        <div class="grid-layout">
+            <div class="feature-card scroll-reveal">
+                <h3>Precision Cut</h3>
+                <p>3cm x 4.78cm. The perfect aspect ratio for your pocket.</p>
+            </div>
+            <div class="feature-card scroll-reveal delay-1">
+                <h3>Acrylic Glass</h3>
+                <p>Crystal clear durability that protects your custom design.</p>
+            </div>
+            <div class="feature-card scroll-reveal delay-2">
+                <h3>Instant Custom</h3>
+                <p>Upload front & back. We handle the rest.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="order" class="snap-section">
+        <div class="order-container">
+            <h2>Create Yours</h2>
+            
+            <form id="orderForm" class="glass-form">
+                <div class="form-grid">
+                    <div class="input-group">
+                        <label>Name</label>
+                        <input type="text" id="name" required placeholder="John Doe">
+                    </div>
+                    <div class="input-group">
+                        <label>Email</label>
+                        <input type="email" id="email" required placeholder="john@example.com">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Phone (Optional)</label>
+                    <input type="tel" id="phone" placeholder="+971 50 000 0000">
+                </div>
+
+                <div class="form-grid">
+                    <div class="input-group">
+                        <label>Quantity (Max 10)</label>
+                        <input type="number" id="quantity" min="1" max="10" value="1" onchange="updatePrice()">
+                    </div>
+                    <div class="input-group">
+                        <label>Promo Code</label>
+                        <div class="promo-row">
+                            <input type="text" id="promo" placeholder="CODE">
+                            <button type="button" onclick="checkPromo()" class="small-btn">Apply</button>
+                        </div>
+                        <small id="promo-status"></small>
+                    </div>
+                </div>
+
+                <div class="file-upload-section">
+                    <div class="file-box">
+                        <label>Front Image</label>
+                        <input type="file" id="front-file" accept="image/*" required>
+                    </div>
+                    <div class="file-box">
+                        <label>Back Image</label>
+                        <input type="file" id="back-file" accept="image/*" required>
+                    </div>
+                </div>
+
+                <div class="price-dock">
+                    <div class="price-row">
+                        <span>Total</span>
+                        <span id="final-price" class="big-price">4.00 AED</span>
+                    </div>
+                    <button type="submit" id="submit-btn" class="buy-btn">
+                        <span id="btn-text">Pay & Order</span>
+                        <div id="loader" class="spinner hidden"></div>
+                    </button>
+                    <p id="error-msg" class="error-text"></p>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <div id="receipt-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="success-icon">✓</div>
+            <h2>Order Confirmed</h2>
+            <p>Thank you, <span id="r-name"></span></p>
+            
+            <div class="receipt-card">
+                <div class="r-row"><span>Order #</span> <span id="r-id"></span></div>
+                <div class="r-row"><span>Qty</span> <span id="r-qty"></span></div>
+                <div class="r-row total"><span>Total</span> <span id="r-total"></span></div>
+            </div>
+
+            <button onclick="downloadReceipt()" class="primary-btn full">Download Receipt (PDF)</button>
+            <button onclick="closeModal()" class="link-btn">Close</button>
+        </div>
     </div>
-  </section>
 
-  <section id="product" class="features-section">
-    <h2 class="section-title">Why Choose Us</h2>
-    <div class="features-grid">
-      <div class="feature-card">
-        <div class="feature-icon">📏</div>
-        <h3>Perfect Size</h3>
-        <p>3cm × 4.78cm acrylic. Fits anywhere, lasts forever.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">🖼️</div>
-        <h3>Full Custom</h3>
-        <p>Your photos on front & back. Crystal clear printing.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">💰</div>
-        <h3>Simple Price</h3>
-        <p>Flat 4 AED each. Bulk up to 10. Promo codes work.</p>
-      </div>
-    </div>
-  </section>
-
-  <section class="product-showcase">
-    <div class="keychain-mockup"></div>
-    <div>
-      <h2>Your Design, Made Real</h2>
-      <p>Upload front/back images → We print on premium acrylic → Delivered.</p>
-      <button class="cta-primary" onclick="scrollTo('order')">Customize Now</button>
-    </div>
-  </section>
-
-  <section id="order">
-    <h2 class="section-title">Place Order</h2>
-    <form id="orderForm" class="order-form">
-      <div class="form-row">
-        <div class="form-group">
-          <label>Name *</label>
-          <input type="text" id="customerName" required>
-        </div>
-        <div class="form-group">
-          <label>Email *</label>
-          <input type="email" id="customerEmail" required>
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>Phone</label>
-          <input type="tel" id="customerPhone">
-        </div>
-        <div class="form-group">
-          <label>Quantity (1-10)</label>
-          <input type="number" id="quantity" min="1" max="10" value="1" required>
-        </div>
-      </div>
-      <div class="form-group">
-        <label>Promo Code</label>
-        <div class="promo-input">
-          <input type="text" id="promoCode" placeholder="Enter code">
-          <button type="button" class="btn-promo" onclick="applyPromo()">Apply</button>
-        </div>
-        <div id="promoMsg"></div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>Front Photo *</label>
-          <input type="file" id="frontPhoto" accept="image/*" required>
-        </div>
-        <div class="form-group">
-          <label>Back Photo *</label>
-          <input type="file" id="backPhoto" accept="image/*" required>
-        </div>
-      </div>
-      <div class="order-summary">
-        <div class="summary-row"><span>Subtotal</span><span id="subtotal">4.00 AED</span></div>
-        <div class="summary-row discount"><span>Discount</span><span id="discount">0.00 AED</span></div>
-        <div class="summary-row total"><span>Total</span><span id="total">4.00 AED</span></div>
-      </div>
-      <button type="submit" class="cta-primary full-width">Place Order</button>
-      <div id="errorMsg" class="error"></div>
-    </form>
-  </section>
-
-  <div id="receiptModal" class="modal-overlay" style="display:none;">
-    <div class="modal-content">
-      <button class="modal-close" onclick="closeModal()">&times;</button>
-      <div class="receipt-header">
-        <h2>✅ Order Confirmed</h2>
-        <div class="order-number">Order #<span id="orderId"></span></div>
-      </div>
-      <div class="detail-row"><span>Name:</span><span id="modalName"></span></div>
-      <div class="detail-row"><span>Email:</span><span id="modalEmail"></span></div>
-      <div class="detail-row"><span>Total:</span><span id="modalTotal"></span></div>
-      <button class="cta-primary" onclick="downloadPDF()">Download PDF</button>
-    </div>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-  <script>
-    emailjs.init({ publicKey: "wFE7Ll5cDKSxM4Zfs" });
-    
-    const supabase = supabase.createClient('https://pkzvftleoysldqmjdgds.supabase.co', 'sb_publishable_H9QIgdBqQZtHXcywZyDsjA_s4fXffjN');
-    const PRICE = 4;
-    
-    function scrollTo(id) {
-      document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
-    }
-    
-    function updatePrice() {
-      const qty = Math.min(Math.max(parseInt(document.getElementById('quantity').value) || 1, 1), 10);
-      document.getElementById('quantity').value = qty;
-      document.getElementById('subtotal').textContent = (qty * PRICE).toFixed(2) + ' AED';
-      document.getElementById('total').textContent = (qty * PRICE).toFixed(2) + ' AED';
-    }
-    
-    document.getElementById('quantity').addEventListener('input', updatePrice);
-    updatePrice();
-    
-    window.applyPromo = async function() {
-      const code = document.getElementById('promoCode').value;
-      if (!code) return;
-      
-      const { data } = await supabase.from('promo_codes').select('*').eq('code', code).eq('active', true).single();
-      if (data) {
-        document.getElementById('promoMsg').textContent = '✓ ' + data.description;
-        document.getElementById('promoMsg').className = 'success';
-        document.getElementById('discount').textContent = '-' + data.discount_value + ' AED';
-        const subtotal = parseFloat(document.getElementById('subtotal').textContent);
-        document.getElementById('total').textContent = (subtotal - data.discount_value).toFixed(2) + ' AED';
-      } else {
-        document.getElementById('promoMsg').textContent = 'Invalid code';
-        document.getElementById('promoMsg').className = 'error';
-      }
-    }
-    
-    document.getElementById('orderForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const btn = e.target.querySelector('.cta-primary');
-      btn.textContent = 'Processing...';
-      
-      const formData = {
-        name: document.getElementById('customerName').value,
-        email: document.getElementById('customerEmail').value,
-        phone: document.getElementById('customerPhone').value || null,
-        qty: parseInt(document.getElementById('quantity').value),
-        total: parseFloat(document.getElementById('total').textContent)
-      };
-      
-      try {
-        const frontFile = document.getElementById('frontPhoto').files[0];
-        const backFile = document.getElementById('backPhoto').files[0];
-        
-        const frontPath = await supabase.storage.from('order-photos').upload(`front/${Date.now()}.jpg`, frontFile);
-        const backPath = await supabase.storage.from('order-photos').upload(`back/${Date.now()}.jpg`, backFile);
-        
-        const { data: order } = await supabase.from('orders').insert({
-          customer_name: formData.name,
-          customer_email: formData.email,
-          phone: formData.phone,
-          items: [{ quantity: formData.qty, price: PRICE }],
-          total_price_aed: formData.total
-        }).select().single();
-        
-        showReceipt(order);
-        
-        emailjs.send('service_zlh57wd', 'template_hu5h00o', {
-          to_name: formData.name,
-          order_id: order.id,
-          total_price: formData.total
-        });
-        
-      } catch (error) {
-        document.getElementById('errorMsg').textContent = 'Error: ' + error.message;
-      }
-      btn.textContent = 'Place Order';
-    });
-    
-    function showReceipt(order) {
-      document.getElementById('orderId').textContent = order.id;
-      document.getElementById('modalName').textContent = order.customer_name;
-      document.getElementById('modalEmail').textContent = order.customer_email;
-      document.getElementById('modalTotal').textContent = order.total_price_aed + ' AED';
-      document.getElementById('receiptModal').style.display = 'flex';
-    }
-    
-    window.closeModal = function() {
-      document.getElementById('receiptModal').style.display = 'none';
-    }
-    
-    window.downloadPDF = function() {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-      doc.text('Order Receipt #' + document.getElementById('orderId').textContent, 20, 20);
-      doc.text('Name: ' + document.getElementById('modalName').textContent, 20, 40);
-      doc.text('Total: ' + document.getElementById('modalTotal').textContent, 20, 60);
-      doc.save('receipt.pdf');
-    }
-  </script>
+    <script src="script.js"></script>
 </body>
 </html>
