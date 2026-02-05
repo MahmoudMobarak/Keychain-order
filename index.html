@@ -3,82 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minimalist Keychain | Enterprise</title>
-    
-    <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+    <title>Enterprise | Premium Custom Keychains</title>
+    <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
 
     <nav class="glass-nav">
         <div class="nav-content">
-            <span class="logo">Enterprise.</span>
+            <span class="logo">ENTERPRISE<span class="dot">.</span></span>
             <div class="nav-links">
-                <a href="#hero">Overview</a>
-                <a href="#specs">Specs</a>
-                <button onclick="scrollToSection('order')" class="nav-btn">Buy</button>
+                <a href="#hero">Product</a>
+                <a href="#specs">Details</a>
+                <button onclick="scrollToSection('order')" class="nav-btn">Order Now</button>
             </div>
         </div>
     </nav>
 
     <section id="hero" class="snap-section">
-        <div class="hero-content fade-in">
-            <span class="pill-badge">IGCSE Project</span>
-            <h1>The Keychain.<br>Reimagined.</h1>
-            <p class="subtitle">Minimalist design. Maximum identity. 4 AED.</p>
+        <div class="hero-content reveal">
+            <span class="pill-badge">IGCSE Enterprise Project</span>
+            <h1>The Keychain, <span class="gradient-text">Perfected.</span></h1>
+            <p class="subtitle">Customizable, durable, and minimalist. Designed to carry what matters most to you for just 4 AED.</p>
             <div class="cta-group">
                 <button onclick="scrollToSection('order')" class="primary-btn">Order Now</button>
-                <a href="#specs" class="link-btn">Learn more ></a>
+                <button onclick="scrollToSection('specs')" class="secondary-btn">See Specs</button>
             </div>
         </div>
-        <div class="hero-visual">
+        <div class="hero-visual reveal delay-1">
             <div class="floating-keychain">
-                <div class="keychain-body"></div>
+                <div class="keychain-inner"><span>3cm x 4.78cm</span></div>
                 <div class="keychain-ring"></div>
             </div>
         </div>
     </section>
 
     <section id="specs" class="snap-section dark-mode">
+        <div class="specs-header reveal">
+            <h2>Technical Specifications</h2>
+            <p>Built for the IGCSE Enterprise program with quality in mind.</p>
+        </div>
         <div class="grid-layout">
-            <div class="feature-card scroll-reveal">
-                <h3>Precision Cut</h3>
-                <p>3cm x 4.78cm. The perfect aspect ratio for your pocket.</p>
+            <div class="feature-card reveal delay-1">
+                <div class="icon">📐</div>
+                <h3>Exact Dimensions</h3>
+                <p>3cm width and 4.78cm height. Slim enough for pockets, large enough for detail.</p>
             </div>
-            <div class="feature-card scroll-reveal delay-1">
-                <h3>Acrylic Glass</h3>
-                <p>Crystal clear durability that protects your custom design.</p>
+            <div class="feature-card reveal delay-2">
+                <div class="icon">🎨</div>
+                <h3>Fully Custom</h3>
+                <p>Upload any photo for the front and back. We use high-res acrylic protection.</p>
             </div>
-            <div class="feature-card scroll-reveal delay-2">
-                <h3>Instant Custom</h3>
-                <p>Upload front & back. We handle the rest.</p>
+            <div class="feature-card reveal delay-3">
+                <div class="icon">💎</div>
+                <h3>Premium Build</h3>
+                <p>Crystal clear casing that is shatter-resistant and lightweight.</p>
             </div>
         </div>
     </section>
 
     <section id="order" class="snap-section">
-        <div class="order-container">
-            <h2>Create Yours</h2>
+        <div class="order-container reveal">
+            <div class="form-header">
+                <h2>Custom Order Form</h2>
+                <p>Fill in your details to create your custom keychain.</p>
+            </div>
             
             <form id="orderForm" class="glass-form">
                 <div class="form-grid">
                     <div class="input-group">
-                        <label>Name</label>
-                        <input type="text" id="name" required placeholder="John Doe">
+                        <label>Your Email</label>
+                        <input type="email" id="email" required placeholder="name@email.com">
                     </div>
                     <div class="input-group">
-                        <label>Email</label>
-                        <input type="email" id="email" required placeholder="john@example.com">
+                        <label>Phone (Optional)</label>
+                        <input type="tel" id="phone" placeholder="+971 -- --- ----">
                     </div>
-                </div>
-
-                <div class="input-group">
-                    <label>Phone (Optional)</label>
-                    <input type="tel" id="phone" placeholder="+971 50 000 0000">
                 </div>
 
                 <div class="form-grid">
@@ -89,27 +92,26 @@
                     <div class="input-group">
                         <label>Promo Code</label>
                         <div class="promo-row">
-                            <input type="text" id="promo" placeholder="CODE">
+                            <input type="text" id="promo" placeholder="Enter code">
                             <button type="button" onclick="checkPromo()" class="small-btn">Apply</button>
                         </div>
-                        <small id="promo-status"></small>
                     </div>
                 </div>
 
                 <div class="file-upload-section">
                     <div class="file-box">
-                        <label>Front Image</label>
+                        <label>Front Photo</label>
                         <input type="file" id="front-file" accept="image/*" required>
                     </div>
                     <div class="file-box">
-                        <label>Back Image</label>
+                        <label>Back Photo</label>
                         <input type="file" id="back-file" accept="image/*" required>
                     </div>
                 </div>
 
                 <div class="price-dock">
                     <div class="price-row">
-                        <span>Total</span>
+                        <span>Total Price</span>
                         <span id="final-price" class="big-price">4.00 AED</span>
                     </div>
                     <button type="submit" id="submit-btn" class="buy-btn">
@@ -125,17 +127,14 @@
     <div id="receipt-modal" class="modal hidden">
         <div class="modal-content">
             <div class="success-icon">✓</div>
-            <h2>Order Confirmed</h2>
-            <p>Thank you, <span id="r-name"></span></p>
-            
+            <h3>Order Received!</h3>
             <div class="receipt-card">
-                <div class="r-row"><span>Order #</span> <span id="r-id"></span></div>
-                <div class="r-row"><span>Qty</span> <span id="r-qty"></span></div>
-                <div class="r-row total"><span>Total</span> <span id="r-total"></span></div>
+                <div class="r-row"><span>Order #:</span> <span id="r-id"></span></div>
+                <div class="r-row"><span>Quantity:</span> <span id="r-qty"></span></div>
+                <div class="r-row total"><span>Total:</span> <span id="r-total"></span></div>
             </div>
-
-            <button onclick="downloadReceipt()" class="primary-btn full">Download Receipt (PDF)</button>
-            <button onclick="closeModal()" class="link-btn">Close</button>
+            <button onclick="downloadReceipt()" class="primary-btn full">Download PDF Receipt</button>
+            <button onclick="window.location.reload()" class="link-btn">Close</button>
         </div>
     </div>
 
