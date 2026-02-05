@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Custom IGCSE Enterprise Keychain</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="logo">Enterprise Keychain</div>
+    <nav class="nav">
+      <button class="nav-btn" data-target="product-section">Product</button>
+      <button class="nav-btn" data-target="order-section">Order</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- PRODUCT PAGE -->
+    <section id="product-section" class="page-section active">
+      <h1>Minimalist Custom Keychain</h1>
+      <p>
+        This **keychain** is our IGCSE Enterprise project product. It is compact, durable, and designed to be a simple daily accessory.
+      </p>
+      <ul class="product-details">
+        <li>Dimensions: 3 cm × 4.78 cm.</li>
+        <li>Price: 4 AED per keychain.</li>
+        <li>Customizable front and back design using your own images.</li>
+      </ul>
+      <p>
+        Perfect for school bags, keys, or as a small gift. Order up to 10 pieces at once and apply promo codes when available.
+      </p>
+      <button class="primary-btn" data-target="order-section">Order now</button>
+    </section>
+
+    <!-- ORDER PAGE -->
+    <section id="order-section" class="page-section">
+      <h2>Place Your Order</h2>
+      <form id="order-form">
+        <div class="form-group">
+          <label for="customer-email">Your email (for receipt and updates)</label>
+          <input type="email" id="customer-email" required placeholder="you@example.com">
+        </div>
+
+        <div class="form-group">
+          <label for="customer-phone">Phone number (optional)</label>
+          <input type="tel" id="customer-phone" placeholder="+9715XXXXXXXX">
+        </div>
+
+        <div class="form-group">
+          <label for="item-quantity">Quantity (1–10)</label>
+          <input type="number" id="item-quantity" min="1" max="10" value="1" required>
+        </div>
+
+        <div class="form-group">
+          <label for="promo-code">Promo code (optional)</label>
+          <input type="text" id="promo-code" placeholder="Enter promo code">
+          <button type="button" id="apply-promo-btn" class="secondary-btn">Apply</button>
+          <div id="promo-message" class="info-text"></div>
+        </div>
+
+        <div class="form-group">
+          <label>Front photo (required)</label>
+          <input type="file" id="front-photo" accept="image/*" required>
+        </div>
+
+        <div class="form-group">
+          <label>Back photo (required)</label>
+          <input type="file" id="back-photo" accept="image/*" required>
+        </div>
+
+        <div class="summary">
+          <p>Base price per keychain: 4 AED</p>
+          <p id="total-price">Total: 4 AED</p>
+        </div>
+
+        <button type="submit" class="primary-btn">Submit order</button>
+        <div id="form-error" class="error-text"></div>
+      </form>
+    </section>
+  </main>
+
+  <!-- RECEIPT POPUP -->
+  <div id="receipt-modal" class="modal hidden">
+    <div class="modal-content" id="receipt-content">
+      <button class="modal-close" id="close-receipt">×</button>
+      <h2>Order receipt</h2>
+      <p><strong>Order number:</strong> <span id="receipt-order-id"></span></p>
+      <p><strong>Email:</strong> <span id="receipt-email"></span></p>
+      <p><strong>Phone:</strong> <span id="receipt-phone"></span></p>
+      <p><strong>Quantity:</strong> <span id="receipt-quantity"></span></p>
+      <p><strong>Promo code:</strong> <span id="receipt-promo"></span></p>
+      <p><strong>Discount:</strong> <span id="receipt-discount"></span> AED</p>
+      <p><strong>Total:</strong> <span id="receipt-total"></span> AED</p>
+      <button id="download-pdf-btn" class="secondary-btn">Download PDF</button>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="script.js"></script>
+</body>
+</html>
