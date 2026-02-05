@@ -1,181 +1,181 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KeyCraft | Custom Keychains</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KeyCraft | Custom Keychains</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.emailjs.com/dist/email.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+<link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <canvas id="bgCanvas"></canvas>
-    
-    <nav class="navbar">
-        <div class="nav-container">
-            <h1 class="logo">KeyCraft</h1>
-            <div class="nav-links">
-                <a href="#hero" class="nav-link active">Product</a>
-                <a href="#order" class="nav-link">Order</a>
-            </div>
+<canvas id="bgCanvas"></canvas>
+
+<nav class="navbar">
+    <div class="nav-container">
+        <h1 class="logo">KeyCraft</h1>
+        <div class="nav-links">
+            <a href="#hero" class="nav-link active">Product</a>
+            <a href="#order" class="nav-link">Order</a>
         </div>
-    </nav>
+    </div>
+</nav>
 
-    <!-- HERO -->
-    <section id="hero" class="hero">
-        <div class="hero-container">
-            <div class="hero-content">
-                <h1 class="hero-title">Custom Photo Keychains</h1>
-                <p class="hero-subtitle">Precision crafted. 3 × 4.78 cm. 4 AED.</p>
-                <div class="hero-specs">
-                    <div class="spec">Premium Acrylic</div>
-                    <div class="spec">Metal Ring</div>
-                    <div class="spec">Double-Sided Print</div>
-                </div>
-                <a href="#order" class="hero-cta">Order Now</a>
+<!-- HERO -->
+<section id="hero" class="hero">
+    <div class="hero-container">
+        <div class="hero-content">
+            <h1 class="hero-title">Custom Photo Keychains</h1>
+            <p class="hero-subtitle">Precision crafted. 3 × 4.78 cm. 4 AED.</p>
+            <div class="hero-specs">
+                <div class="spec">Premium Acrylic</div>
+                <div class="spec">Metal Ring</div>
+                <div class="spec">Double-Sided Print</div>
             </div>
-            <div class="hero-visual">
-                <div class="keychain-sketch">
-                    <svg viewBox="0 0 300 400" class="sketch">
-                        <defs>
-                            <linearGradient id="sketchGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" stop-color="#f8f9fa"/>
-                                <stop offset="50%" stop-color="#e9ecef"/>
-                                <stop offset="100%" stop-color="#dee2e6"/>
-                            </linearGradient>
-                            <filter id="sketchShadow">
-                                <feDropShadow dx="0" dy="4" stdDeviation="2" flood-color="#00000020"/>
-                            </filter>
-                        </defs>
-                        <!-- Keychain body -->
-                        <rect x="60" y="100" width="180" height="240" rx="24" fill="url(#sketchGrad)" filter="url(#sketchShadow)"/>
-                        <!-- Front shine -->
-                        <ellipse cx="150" cy="150" rx="60" ry="20" fill="rgba(255,255,255,0.4)"/>
-                        <!-- Ring -->
-                        <circle cx="150" cy="90" r="18" fill="#adb5bd" stroke="#6c757d" stroke-width="2"/>
-                        <!-- Sketch lines -->
-                        <path d="M60 124 Q150 110 240 124 M64 140 Q150 128 236 140 M68 240 Q150 228 232 240" stroke="#6c757d" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-                        <!-- Photo placeholder -->
-                        <rect x="75" y="115" width="150" height="210" rx="12" fill="#ffffff" opacity="0.7"/>
-                        <text x="150" y="200" text-anchor="middle" fill="#adb5bd" font-size="14" font-weight="300">Your Photo</text>
-                    </svg>
-                    <div class="sketch-glow"></div>
-                </div>
-            </div>
+            <a href="#order" class="hero-cta">Order Now</a>
         </div>
-    </section>
-
-    <!-- ORDER -->
-    <section id="order" class="order-section">
-        <div class="container">
-            <h2 class="section-title">Place Order</h2>
-            <form id="orderForm" class="order-form">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label>Name</label>
-                        <input type="text" id="customerName" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Email</label>
-                        <input type="email" id="customerEmail" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Phone</label>
-                        <input type="tel" id="phone">
-                    </div>
-                    <div class="form-group">
-                        <label>Promo</label>
-                        <input type="text" id="promoCode" placeholder="SUMMER20">
-                    </div>
-                </div>
-                
-                <div class="quantity-section">
-                    <label>Quantity (1-10)</label>
-                    <div class="quantity-control">
-                        <button type="button" class="qty-btn" id="qtyMinus">-</button>
-                        <input type="number" id="quantity" value="1" min="1" max="10">
-                        <button type="button" class="qty-btn" id="qtyPlus">+</button>
-                    </div>
-                </div>
-
-                <div class="upload-section">
-                    <div class="upload-card" data-side="front">
-                        <input type="file" id="frontPhoto" accept="image/*" required>
-                        <div class="upload-area">
-                            <svg class="upload-icon" viewBox="0 0 48 48">
-                                <circle cx="24" cy="24" r="20" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
-                                <path d="M24 12 L24 36 M12 24 L36 24" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
-                            </svg>
-                            <p>Front Photo</p>
-                            <span>Click to upload</span>
-                        </div>
-                        <img id="frontPreview" class="preview">
-                    </div>
-                    <div class="upload-card" data-side="back">
-                        <input type="file" id="backPhoto" accept="image/*" required>
-                        <div class="upload-area">
-                            <svg class="upload-icon" viewBox="0 0 48 48">
-                                <circle cx="24" cy="24" r="20" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
-                                <path d="M24 12 L24 36 M12 24 L36 24" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
-                            </svg>
-                            <p>Back Photo</p>
-                            <span>Click to upload</span>
-                        </div>
-                        <img id="backPreview" class="preview">
-                    </div>
-                </div>
-
-                <div class="summary-card">
-                    <div class="summary-row">
-                        <span>Subtotal</span>
-                        <span id="subtotal">4.00 AED</span>
-                    </div>
-                    <div class="summary-row discount" id="discountRow" style="display: none;">
-                        <span>Discount</span>
-                        <span id="discountAmount">0.00 AED</span>
-                    </div>
-                    <div class="summary-row total">
-                        <span>Total</span>
-                        <span id="totalAmount">4.00 AED</span>
-                    </div>
-                </div>
-
-                <button type="submit" class="submit-btn" id="submitBtn">
-                    Place Order
-                    <div class="loader"></div>
-                </button>
-            </form>
-        </div>
-    </section>
-
-    <!-- RECEIPT MODAL -->
-    <div id="receiptModal" class="modal">
-        <div class="modal-content">
-            <div class="receipt" id="receiptContent">
-                <div class="receipt-header">
-                    <h2>Order Confirmed</h2>
-                    <div id="orderNumber" class="order-number"></div>
-                </div>
-                <div class="receipt-details">
-                    <div class="detail-row"><strong>Name:</strong> <span id="receiptName"></span></div>
-                    <div class="detail-row"><strong>Email:</strong> <span id="receiptEmail"></span></div>
-                    <div class="detail-row"><strong>Total:</strong> <span id="receiptTotal"></span></div>
-                </div>
-                <div class="receipt-photos">
-                    <img id="receiptFront">
-                    <img id="receiptBack">
-                </div>
-                <div class="modal-actions">
-                    <button onclick="downloadPDF()" class="pdf-btn">Download PDF</button>
-                    <button onclick="closeReceipt()" class="close-btn">New Order</button>
-                </div>
+        <div class="hero-visual">
+            <div class="keychain-sketch">
+                <svg viewBox="0 0 300 400" class="sketch">
+                    <defs>
+                        <linearGradient id="sketchGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#f8f9fa"/>
+                            <stop offset="50%" stop-color="#e9ecef"/>
+                            <stop offset="100%" stop-color="#dee2e6"/>
+                        </linearGradient>
+                        <filter id="sketchShadow">
+                            <feDropShadow dx="0" dy="4" stdDeviation="2" flood-color="#00000020"/>
+                        </filter>
+                    </defs>
+                    <!-- Keychain body -->
+                    <rect x="60" y="100" width="180" height="240" rx="24" fill="url(#sketchGrad)" filter="url(#sketchShadow)"/>
+                    <!-- Front shine -->
+                    <ellipse cx="150" cy="150" rx="60" ry="20" fill="rgba(255,255,255,0.4)"/>
+                    <!-- Ring -->
+                    <circle cx="150" cy="90" r="18" fill="#adb5bd" stroke="#6c757d" stroke-width="2"/>
+                    <!-- Sketch lines -->
+                    <path d="M60 124 Q150 110 240 124 M64 140 Q150 128 236 140 M68 240 Q150 228 232 240" stroke="#6c757d" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+                    <!-- Photo placeholder -->
+                    <rect x="75" y="115" width="150" height="210" rx="12" fill="#ffffff" opacity="0.7"/>
+                    <text x="150" y="200" text-anchor="middle" fill="#adb5bd" font-size="14" font-weight="300">Your Photo</text>
+                </svg>
+                <div class="sketch-glow"></div>
             </div>
         </div>
     </div>
+</section>
 
-    <script src="script.js"></script>
+<!-- ORDER -->
+<section id="order" class="order-section">
+    <div class="container">
+        <h2 class="section-title">Place Order</h2>
+        <form id="orderForm" class="order-form">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" id="customerName" required>
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="customerEmail" required>
+                </div>
+                <div class="form-group">
+                    <label>Phone</label>
+                    <input type="tel" id="phone">
+                </div>
+                <div class="form-group">
+                    <label>Promo</label>
+                    <input type="text" id="promoCode" placeholder="SUMMER20">
+                </div>
+            </div>
+            
+            <div class="quantity-section">
+                <label>Quantity (1-10)</label>
+                <div class="quantity-control">
+                    <button type="button" class="qty-btn" id="qtyMinus">-</button>
+                    <input type="number" id="quantity" value="1" min="1" max="10">
+                    <button type="button" class="qty-btn" id="qtyPlus">+</button>
+                </div>
+            </div>
+
+            <div class="upload-section">
+                <div class="upload-card" data-side="front">
+                    <input type="file" id="frontPhoto" accept="image/*" required>
+                    <div class="upload-area">
+                        <svg class="upload-icon" viewBox="0 0 48 48">
+                            <circle cx="24" cy="24" r="20" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                            <path d="M24 12 L24 36 M12 24 L36 24" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                        </svg>
+                        <p>Front Photo</p>
+                        <span>Click to upload</span>
+                    </div>
+                    <img id="frontPreview" class="preview">
+                </div>
+                <div class="upload-card" data-side="back">
+                    <input type="file" id="backPhoto" accept="image/*" required>
+                    <div class="upload-area">
+                        <svg class="upload-icon" viewBox="0 0 48 48">
+                            <circle cx="24" cy="24" r="20" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                            <path d="M24 12 L24 36 M12 24 L36 24" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                        </svg>
+                        <p>Back Photo</p>
+                        <span>Click to upload</span>
+                    </div>
+                    <img id="backPreview" class="preview">
+                </div>
+            </div>
+
+            <div class="summary-card">
+                <div class="summary-row">
+                    <span>Subtotal</span>
+                    <span id="subtotal">4.00 AED</span>
+                </div>
+                <div class="summary-row discount" id="discountRow" style="display: none;">
+                    <span>Discount</span>
+                    <span id="discountAmount">0.00 AED</span>
+                </div>
+                <div class="summary-row total">
+                    <span>Total</span>
+                    <span id="totalAmount">4.00 AED</span>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn" id="submitBtn">
+                Place Order
+                <div class="loader"></div>
+            </button>
+        </form>
+    </div>
+</section>
+
+<!-- RECEIPT MODAL -->
+<div id="receiptModal" class="modal">
+    <div class="modal-content">
+        <div class="receipt" id="receiptContent">
+            <div class="receipt-header">
+                <h2>Order Confirmed</h2>
+                <div id="orderNumber" class="order-number"></div>
+            </div>
+            <div class="receipt-details">
+                <div class="detail-row"><strong>Name:</strong> <span id="receiptName"></span></div>
+                <div class="detail-row"><strong>Email:</strong> <span id="receiptEmail"></span></div>
+                <div class="detail-row"><strong>Total:</strong> <span id="receiptTotal"></span></div>
+            </div>
+            <div class="receipt-photos">
+                <img id="receiptFront">
+                <img id="receiptBack">
+            </div>
+            <div class="modal-actions">
+                <button onclick="downloadPDF()" class="pdf-btn">Download PDF</button>
+                <button onclick="closeReceipt()" class="close-btn">New Order</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>
