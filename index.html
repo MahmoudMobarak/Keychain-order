@@ -2,161 +2,209 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Enterprise Keychain – Order</title>
+  <title>Enterprise Keychain</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-  <header class="site-header">
-    <div class="logo">Enterprise Keychain</div>
+  <!-- LOADING SCREEN -->
+  <div id="loader" class="loader">
+    <div class="loader-logo">Enterprise</div>
+  </div>
+
+  <!-- NAVIGATION -->
+  <header class="header">
     <nav class="nav">
-      <button class="nav-btn" data-target="hero-section">Home</button>
-      <button class="nav-btn" data-target="product-section">Product</button>
-      <button class="nav-btn" data-target="order-section">Order</button>
+      <div class="logo">Enterprise</div>
+      <div class="nav-links">
+        <a href="#hero" class="nav-link active">Home</a>
+        <a href="#product" class="nav-link">Product</a>
+        <a href="#order" class="nav-link">Order</a>
+      </div>
     </nav>
   </header>
 
   <main>
-    <!-- HERO / ADVERTISING SECTION -->
-    <section id="hero-section" class="page-section active hero">
+    <!-- HERO SECTION (Apple-style full-screen hero) -->
+    <section id="hero" class="hero-section">
+      <div class="hero-bg"></div>
       <div class="hero-content">
-        <h1>Minimalist Keychain, Maximum Identity.</h1>
-        <p>
-          A clean, modern keychain designed as part of our IGCSE Enterprise project – made to feel like a real product from a real brand.
-        </p>
-        <ul>
-          <li>3 cm × 4.78 cm premium acrylic body.</li>
-          <li>Front and back fully customizable with your images.</li>
-          <li>Flat 4 AED per keychain, bulk orders up to 10 pieces.</li>
-        </ul>
-        <button class="primary-btn" data-target="order-section">Order now</button>
-      </div>
-      <div class="hero-card">
-        <h2>Why this keychain?</h2>
-        <p>Slim design, durable finish, and a clean look that fits school, work, and everyday carry.</p>
-        <p>Designed, tested, and sold by students – you support our project with every order.</p>
-      </div>
-    </section>
-
-    <!-- PRODUCT DETAILS SECTION -->
-    <section id="product-section" class="page-section">
-      <h2>The Product</h2>
-      <div class="product-grid">
-        <div>
-          <h3>Design</h3>
-          <p>
-            The keychain uses a simple rectangular layout so your design is always clear and easy to read.
-          </p>
-          <ul class="product-details">
-            <li>Dimensions: 3 cm × 4.78 cm.</li>
-            <li>Material: clear acrylic with printed insert.</li>
-            <li>Finish: smooth edges, minimalist look.</li>
-          </ul>
+        <div class="hero-badge">IGCSE Enterprise Project</div>
+        <h1 class="hero-title">
+          <span class="title-line">Minimalist</span>
+          <span class="title-line">Keychain</span>
+          <span class="title-line sub">Maximum Identity</span>
+        </h1>
+        <p class="hero-subtitle">Customizable. Durable. 4 AED.</p>
+        <div class="hero-stats">
+          <div class="stat">
+            <span class="stat-number">3 × 4.78</span>
+            <span class="stat-label">CM Dimensions</span>
+          </div>
+          <div class="stat">
+            <span class="stat-number">4</span>
+            <span class="stat-label">AED Each</span>
+          </div>
+          <div class="stat">
+            <span class="stat-number">10</span>
+            <span class="stat-label">Max Order</span>
+          </div>
         </div>
-        <div>
-          <h3>Price & value</h3>
-          <p>
-            One flat price: 4 AED per keychain. No hidden fees, even when you customize both sides.
-          </p>
-          <ul class="product-details">
-            <li>Flat 4 AED per keychain.</li>
-            <li>Order from 1 up to 10 pieces in a single order.</li>
-            <li>Promo codes available for special discounts.</li>
-          </ul>
-        </div>
+        <button class="cta-primary" data-scroll="order-section">Order Now</button>
+      </div>
+      <div class="hero-scroll-hint">
+        <div class="scroll-arrow"></div>
       </div>
     </section>
 
-    <!-- ORDER FORM SECTION -->
-    <section id="order-section" class="page-section">
-      <h2>Place Your Order</h2>
-      <form id="order-form">
-        <div class="form-row">
-          <div class="form-group">
-            <label for="customer-name">Your name</label>
-            <input type="text" id="customer-name" required placeholder="Your full name">
+    <!-- PRODUCT FEATURES SECTION -->
+    <section id="product" class="features-section">
+      <div class="container">
+        <h2 class="section-title">Designed to Last</h2>
+        <div class="features-grid">
+          <div class="feature-card slide-in" data-delay="100">
+            <div class="feature-icon">📐</div>
+            <h3>Perfect Dimensions</h3>
+            <p>3cm × 4.78cm acrylic body. Slim enough for pockets, strong enough for daily use.</p>
           </div>
-          <div class="form-group">
-            <label for="customer-email">Your email (for receipt and updates)</label>
-            <input type="email" id="customer-email" required placeholder="you@example.com">
+          <div class="feature-card slide-in" data-delay="200">
+            <div class="feature-icon">🎨</div>
+            <h3>Fully Customizable</h3>
+            <p>Upload your images for front and back. Your design, your style, perfect clarity.</p>
           </div>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label for="customer-phone">Phone number (optional)</label>
-            <input type="tel" id="customer-phone" placeholder="+9715XXXXXXXX">
-          </div>
-          <div class="form-group">
-            <label for="item-quantity">Quantity (1–10)</label>
-            <input type="number" id="item-quantity" min="1" max="10" value="1" required>
+          <div class="feature-card slide-in" data-delay="300">
+            <div class="feature-icon">⚡</div>
+            <h3>Flat Pricing</h3>
+            <p>4 AED per keychain. Order up to 10 at once. Promo codes available.</p>
           </div>
         </div>
+      </div>
+    </section>
 
-        <div class="form-group">
-          <label for="promo-code">Promo code (optional)</label>
-          <div class="inline">
-            <input type="text" id="promo-code" placeholder="Enter promo code">
-            <button type="button" id="apply-promo-btn" class="secondary-btn">Apply</button>
+    <!-- PRODUCT SHOWCASE (Apple-style product reveal) -->
+    <section class="product-showcase">
+      <div class="product-mockup">
+        <div class="keychain-front"></div>
+        <div class="keychain-back"></div>
+        <div class="keychain-ring"></div>
+      </div>
+      <div class="product-info slide-in">
+        <h2>Your Design, Realized</h2>
+        <p>Upload front and back images. We print directly onto premium acrylic. Smooth edges, vibrant colors, built to last.</p>
+        <button class="cta-secondary" data-scroll="order-section">Start Customizing</button>
+      </div>
+    </section>
+
+    <!-- ORDER SECTION -->
+    <section id="order" class="order-section">
+      <div class="container">
+        <h2 class="section-title">Place Your Order</h2>
+        <form id="order-form" class="order-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Name</label>
+              <input type="text" id="customer-name" required placeholder="Your full name">
+            </div>
+            <div class="form-group">
+              <label>Email</label>
+              <input type="email" id="customer-email" required placeholder="you@example.com">
+            </div>
           </div>
-          <div id="promo-message" class="info-text"></div>
-        </div>
-
-        <div class="form-row">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Phone (optional)</label>
+              <input type="tel" id="customer-phone" placeholder="+971 50 XXX XXXX">
+            </div>
+            <div class="form-group">
+              <label>Quantity</label>
+              <input type="number" id="item-quantity" min="1" max="10" value="1" required>
+            </div>
+          </div>
           <div class="form-group">
-            <label>Front photo (required)</label>
-            <input type="file" id="front-photo" accept="image/*" required>
+            <label>Promo Code</label>
+            <div class="promo-input">
+              <input type="text" id="promo-code" placeholder="Enter code">
+              <button type="button" id="apply-promo-btn" class="btn-promo">Apply</button>
+            </div>
+            <div id="promo-message"></div>
           </div>
-          <div class="form-group">
-            <label>Back photo (required)</label>
-            <input type="file" id="back-photo" accept="image/*" required>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Front Photo</label>
+              <input type="file" id="front-photo" accept="image/*" required>
+            </div>
+            <div class="form-group">
+              <label>Back Photo</label>
+              <input type="file" id="back-photo" accept="image/*" required>
+            </div>
           </div>
-        </div>
-
-        <div class="summary">
-          <p>Base price per keychain: 4 AED</p>
-          <p id="total-price">Total: 4 AED</p>
-        </div>
-
-        <button type="submit" class="primary-btn">Submit order</button>
-        <div id="form-error" class="error-text"></div>
-      </form>
+          <div class="order-summary">
+            <div class="summary-row">
+              <span>4 AED × Quantity</span>
+              <span id="base-total">4 AED</span>
+            </div>
+            <div class="summary-row discount">
+              <span>Discount</span>
+              <span id="discount-total">0 AED</span>
+            </div>
+            <div class="summary-row total">
+              <span>Total</span>
+              <span id="total-price">4 AED</span>
+            </div>
+          </div>
+          <button type="submit" class="cta-primary full-width">Place Order</button>
+          <div id="form-error" class="form-error"></div>
+        </form>
+      </div>
     </section>
   </main>
 
-  <!-- RECEIPT POPUP -->
-  <div id="receipt-modal" class="modal hidden">
-    <div class="modal-content" id="receipt-content">
-      <button class="modal-close" id="close-receipt">×</button>
-      <h2>Order receipt</h2>
-      <p><strong>Order number:</strong> <span id="receipt-order-id"></span></p>
-      <p><strong>Name:</strong> <span id="receipt-name"></span></p>
-      <p><strong>Email:</strong> <span id="receipt-email"></span></p>
-      <p><strong>Phone:</strong> <span id="receipt-phone"></span></p>
-      <p><strong>Quantity:</strong> <span id="receipt-quantity"></span></p>
-      <p><strong>Promo code:</strong> <span id="receipt-promo"></span></p>
-      <p><strong>Discount:</strong> <span id="receipt-discount"></span> AED</p>
-      <p><strong>Total:</strong> <span id="receipt-total"></span> AED</p>
-      <button id="download-pdf-btn" class="secondary-btn">Download PDF</button>
+  <!-- RECEIPT MODAL -->
+  <div id="receipt-modal" class="modal-overlay">
+    <div class="modal-content">
+      <button class="modal-close">&times;</button>
+      <div class="receipt-header">
+        <h2>Order Confirmed</h2>
+        <div class="order-number">#<span id="receipt-order-id"></span></div>
+      </div>
+      <div class="receipt-details">
+        <div class="detail-row">
+          <span>Name:</span>
+          <span id="receipt-name"></span>
+        </div>
+        <div class="detail-row">
+          <span>Email:</span>
+          <span id="receipt-email"></span>
+        </div>
+        <div class="detail-row">
+          <span>Phone:</span>
+          <span id="receipt-phone"></span>
+        </div>
+        <div class="detail-row">
+          <span>Quantity:</span>
+          <span id="receipt-quantity"></span>
+        </div>
+        <div class="detail-row">
+          <span>Promo:</span>
+          <span id="receipt-promo"></span>
+        </div>
+        <div class="detail-row bold">
+          <span>Total:</span>
+          <span id="receipt-total"></span>
+        </div>
+      </div>
+      <button id="download-pdf" class="btn-secondary">Download Receipt</button>
     </div>
   </div>
 
-  <!-- Supabase JS -->
+  <!-- SCRIPTS -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-  <!-- jsPDF for PDF receipts -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
-  <!-- EmailJS (browser SDK) -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <script>
-    // Replace with your real EmailJS public key
-    emailjs.init({
-      publicKey: "wFE7Ll5cDKSxM4Zfs"
-    });
+    emailjs.init({ publicKey: "wFE7Ll5cDKSxM4Zfs" });
   </script>
-
-  <!-- Your main JS -->
   <script src="script.js"></script>
 </body>
 </html>
