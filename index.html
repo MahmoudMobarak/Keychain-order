@@ -17,17 +17,17 @@
   </header>
 
   <main>
-    <!-- HERO / ADVERTISING -->
+    <!-- HERO / ADVERTISING SECTION -->
     <section id="hero-section" class="page-section active hero">
       <div class="hero-content">
         <h1>Minimalist Keychain, Maximum Identity.</h1>
         <p>
-          A clean, modern keychain designed as part of our IGCSE Enterprise project – made to look like a real product from a real brand.
+          A clean, modern keychain designed as part of our IGCSE Enterprise project – made to feel like a real product from a real brand.
         </p>
         <ul>
           <li>3 cm × 4.78 cm premium acrylic body.</li>
           <li>Front and back fully customizable with your images.</li>
-          <li>Flat 4 AED per keychain, bulk up to 10 pieces.</li>
+          <li>Flat 4 AED per keychain, bulk orders up to 10 pieces.</li>
         </ul>
         <button class="primary-btn" data-target="order-section">Order now</button>
       </div>
@@ -38,7 +38,7 @@
       </div>
     </section>
 
-    <!-- DETAILED PRODUCT SECTION -->
+    <!-- PRODUCT DETAILS SECTION -->
     <section id="product-section" class="page-section">
       <h2>The Product</h2>
       <div class="product-grid">
@@ -60,7 +60,7 @@
           </p>
           <ul class="product-details">
             <li>Flat 4 AED per keychain.</li>
-            <li>Order up to 10 at once.</li>
+            <li>Order from 1 up to 10 pieces in a single order.</li>
             <li>Promo codes available for special discounts.</li>
           </ul>
         </div>
@@ -141,17 +141,22 @@
     </div>
   </div>
 
-  <!-- Supabase -->
+  <!-- Supabase JS -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <!-- jsPDF for receipt -->
+
+  <!-- jsPDF for PDF receipts -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
   <!-- EmailJS (browser SDK) -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <script>
+    // Replace with your real EmailJS public key
     emailjs.init({
-      publicKey: "YOUR_EMAILJS_PUBLIC_KEY"
+      publicKey: "wFE7Ll5cDKSxM4Zfs"
     });
   </script>
+
+  <!-- Your main JS -->
   <script src="script.js"></script>
 </body>
 </html>
