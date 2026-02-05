@@ -1,82 +1,119 @@
-diff --git a/admin.html b/admin.html
-index b3b885a972237eabcd2d29c8959bdc404233bcf1..e8e6cae48d56fa31adff4a77e4bbce53126c7b0c 100644
---- a/admin.html
-+++ b/admin.html
-@@ -1,52 +1,33 @@
- <!DOCTYPE html>
- <html lang="en">
- <head>
--    <meta charset="UTF-8">
--    <title>Enterprise Admin</title>
--    <style>
--        body { font-family: sans-serif; background: #f5f5f7; padding: 40px; }
--        .card { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); }
--        .order-row { border-bottom: 1px solid #eee; padding: 15px 0; display: flex; justify-content: space-between; }
--        .hidden { display: none; }
--    </style>
-+  <meta charset="UTF-8">
-+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-+  <title>Admin | Enterprise Keychain</title>
-+  <link rel="stylesheet" href="style.css">
- </head>
--<body>
--    <div id="login-box" class="card" style="max-width:300px; margin:auto; text-align:center;">
--        <h2>Admin Login</h2>
--        <input type="password" id="pass" placeholder="Password" style="width:100%; margin:10px 0; padding:10px;">
--        <button onclick="login()">Enter</button>
--    </div>
-+<body class="admin-body">
-+  <main class="admin-main">
-+    <section id="admin-login-section" class="admin-card">
-+      <h1>Admin login</h1>
-+      <form id="admin-login-form">
-+        <label>Password
-+          <input type="password" id="admin-password" required>
-+        </label>
-+        <button type="submit" class="primary-btn full">Enter</button>
-+        <p id="admin-login-error" class="error"></p>
-+      </form>
-+    </section>
- 
--    <div id="admin-panel" class="hidden">
--        <h1>All Orders</h1>
--        <div id="order-list" class="card">Loading...</div>
--    </div>
-+    <section id="admin-orders-section" class="admin-card hidden">
-+      <h2>Orders</h2>
-+      <button id="refresh-orders" class="secondary-btn">Refresh</button>
-+      <div id="orders-list" class="orders-list">Loading...</div>
-+    </section>
-+  </main>
- 
--    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
--    <script>
--        const SUPABASE_URL = "YOUR_SUPABASE_URL";
--        const SUPABASE_KEY = "YOUR_SUPABASE_ANON_KEY";
--        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
--
--        function login() {
--            // Password logic
--            if(document.getElementById('pass').value === "admin123") {
--                document.getElementById('login-box').style.display = 'none';
--                document.getElementById('admin-panel').classList.remove('hidden');
--                loadOrders();
--            } else { alert("Wrong password"); }
--        }
--
--        async function loadOrders() {
--            const { data } = await supabase.from('orders').select('*').order('created_at', {ascending: false});
--            const list = document.getElementById('order-list');
--            list.innerHTML = data.map(o => `
--                <div class="order-row">
--                    <div><b>#${o.id}</b> - ${o.customer_email} (Qty: ${o.quantity})</div>
--                    <div><a href="${SUPABASE_URL}/storage/v1/object/public/order-photos/${o.front_image}" target="_blank">Front</a></div>
--                </div>
--            `).join('');
--        }
--    </script>
-+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-+  <script src="admin-config.js"></script>
-+  <script src="admin.js"></script>
- </body>
- </html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Keychain Orders</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .admin-container { max-width: 1400px; margin: 2rem auto; padding: 2rem; }
+        .password-form { max-width: 400px; margin: 4rem auto; text-align: center; }
+        .orders-table { width: 100%; border-collapse: collapse; margin-top: 2rem; }
+        .orders-table th, .orders-table td { padding: 1rem; text-align: left; border-bottom: 1px solid #e5e5e7; }
+        .orders-table th { background: #f5f5f7; font-weight: 600; }
+        .download-btn { background: #0071e3; color: white; padding: 0.5rem 1rem; border-radius: 8px; text-decoration: none; }
+        .status { padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
+        .status.confirmed { background: #d4edda; color: #155724; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <h1>🛠️ Admin Panel</h1>
+        
+        <!-- Password Form -->
+        <div id="passwordForm" class="password-form">
+            <h2>Enter Admin Password</h2>
+            <input type="password" id="adminPassword" placeholder="Password" style="width: 100%; padding: 1rem; border: 2px solid #e5e5e7; border-radius: 12px; font-size: 1.1rem;">
+            <button onclick="checkPassword()" class="cta-button" style="margin-top: 1rem; width: 100%;">Login</button>
+        </div>
+
+        <!-- Orders Table -->
+        <div id="ordersTable" class="hidden">
+            <h2>Recent Orders</h2>
+            <table class="orders-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Date</th>
+                        <th>Customer</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Quantity</th>
+                        <th>Total (AED)</th>
+                        <th>Promo</th>
+                        <th>Photos</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="ordersBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+        const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+        const ADMIN_PASSWORD = 'YOUR_ADMIN_PASSWORD'; // Same as in .env
+
+        const { createClient } = supabase;
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        async function checkPassword() {
+            const password = document.getElementById('adminPassword').value;
+            if (password === ADMIN_PASSWORD) {
+                document.getElementById('passwordForm').classList.add('hidden');
+                document.getElementById('ordersTable').classList.remove('hidden');
+                loadOrders();
+            } else {
+                alert('Incorrect password');
+            }
+        }
+
+        async function loadOrders() {
+            const { data: orders, error } = await supabase
+                .from('orders')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                console.error('Error loading orders:', error);
+                return;
+            }
+
+            const tbody = document.getElementById('ordersBody');
+            tbody.innerHTML = '';
+
+            orders.forEach(order => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>#${order.id}</td>
+                    <td>${new Date(order.created_at).toLocaleString()}</td>
+                    <td>${order.customer_name}</td>
+                    <td>${order.customer_email}</td>
+                    <td>${order.phone || '-'}</td>
+                    <td>${order.items[0].quantity}</td>
+                    <td>${order.total_price_aed.toFixed(2)}</td>
+                    <td>${order.promo_code || '-'}</td>
+                    <td>
+                        ${order.front_photo_path ? `<a href="${getPublicUrl(order.front_photo_path)}" target="_blank">Front</a>` : '-'}
+                        ${order.back_photo_path ? ` | <a href="${getPublicUrl(order.back_photo_path)}" target="_blank">Back</a>` : ''}
+                    </td>
+                    <td>
+                        <a href="${getPublicUrl(order.front_photo_path)}" download="${order.id}_front.jpg" class="download-btn">Front ↓</a>
+                        <a href="${getPublicUrl(order.back_photo_path)}" download="${order.id}_back.jpg" class="download-btn" style="margin-left: 0.5rem;">Back ↓</a>
+                    </td>
+                `;
+            });
+        }
+
+        function getPublicUrl(path) {
+            return `https://your-project-id.supabase.co/storage/v1/object/public/order-photos/${path}`;
+        }
+
+        // Auto-refresh every 30 seconds
+        setInterval(loadOrders, 30000);
+    </script>
+</body>
+</html>
