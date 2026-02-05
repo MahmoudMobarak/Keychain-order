@@ -12,7 +12,6 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Full-width Navigation -->
     <nav class="navbar">
         <div class="nav-container">
             <div class="logo">KeyCraft</div>
@@ -24,228 +23,188 @@
         </div>
     </nav>
 
-    <!-- HERO SECTION - Full Coverage -->
-    <section id="hero" class="hero-section">
-        <div class="hero-overlay"></div>
+    <!-- HERO -->
+    <section id="hero" class="hero-section animate">
         <div class="hero-content">
-            <div class="hero-text">
+            <div class="hero-text animate-item" data-delay="100">
                 <h1>Custom Photo Keychains</h1>
                 <div class="hero-price">4<span class="aed">AED</span></div>
-                <p class="hero-desc">3 × 4.78 cm • Premium acrylic • Double-sided printing</p>
-                <div class="hero-stats">
-                    <div class="stat">
-                        <div class="stat-number">500+</div>
-                        <div class="stat-label">Orders Delivered</div>
-                    </div>
-                    <div class="stat">
-                        <div class="stat-number">24h</div>
-                        <div class="stat-label">Processing</div>
-                    </div>
-                    <div class="stat">
-                        <div class="stat-number">100%</div>
-                        <div class="stat-label">Sharjah Delivery</div>
-                    </div>
-                </div>
-                <a href="#order" class="hero-cta">Start Your Order</a>
+                <p>3 × 4.78 cm • Premium acrylic • Bulk orders welcome</p>
+                <a href="#order" class="hero-cta animate-item" data-delay="200">Order Now</a>
             </div>
-            <div class="hero-visual">
-                <div class="keychain-3d">
+            <div class="hero-visual animate-item" data-delay="300">
+                <div class="keychain-demo">
                     <div class="keychain-front"></div>
-                    <div class="keychain-back"></div>
                     <div class="keychain-ring"></div>
-                    <div class="keychain-shadow"></div>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- FEATURES -->
-    <section id="features" class="features-section">
+    <section id="features" class="features-section animate">
         <div class="container">
-            <h2>Everything You Need</h2>
+            <h2 class="animate-item" data-delay="0">Perfect for IGCSE Enterprise</h2>
             <div class="features-grid">
-                <div class="feature-card">
+                <div class="feature-card animate-item" data-delay="100">
                     <div class="feature-icon">🎨</div>
-                    <h3>Full Customization</h3>
-                    <p>Upload front & back photos. Perfect for photos, logos, artwork.</p>
+                    <h3>Double Sided</h3>
+                    <p>Front & back photo printing</p>
                 </div>
-                <div class="feature-card">
-                    <div class="feature-icon">⚙️</div>
-                    <h3>Premium Materials</h3>
-                    <p>3mm thick acrylic with glossy finish and metal ring.</p>
+                <div class="feature-card animate-item" data-delay="200">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Fast Production</h3>
+                    <p>24hr processing in Sharjah</p>
                 </div>
-                <div class="feature-card">
-                    <div class="feature-icon">📦</div>
-                    <h3>Fast Delivery</h3>
-                    <p>Bulk orders up to 10 items. Same-day processing in Sharjah.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">💰</div>
-                    <h3>Student Pricing</h3>
-                    <p>Perfect for IGCSE Enterprise projects. Only 4 AED each.</p>
+                <div class="feature-card animate-item" data-delay="300">
+                    <div class="feature-icon">💎</div>
+                    <h3>Premium Quality</h3>
+                    <p>Thick acrylic + metal ring</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- ORDER SECTION -->
-    <section id="order" class="order-section">
+    <!-- ORDER FORM -->
+    <section id="order" class="order-section animate">
         <div class="container">
-            <div class="section-header">
-                <h2>Place Your Order</h2>
-                <p>Complete the form below. You'll receive instant confirmation.</p>
-            </div>
-            
-            <form id="orderForm" class="order-form">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Full Name *</label>
+            <h2 class="section-title animate-item" data-delay="0">Place Your Order</h2>
+            <form id="orderForm" class="order-form animate-item" data-delay="100">
+                <div class="input-row">
+                    <div class="input-group">
+                        <label>Name *</label>
                         <input type="text" id="customerName" required>
                     </div>
-                    <div class="form-group">
-                        <label>Email Address *</label>
+                    <div class="input-group">
+                        <label>Email *</label>
                         <input type="email" id="customerEmail" required>
                     </div>
                 </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Phone Number</label>
+                <div class="input-row">
+                    <div class="input-group">
+                        <label>Phone</label>
                         <input type="tel" id="phone">
                     </div>
-                    <div class="form-group">
+                    <div class="input-group">
                         <label>Promo Code</label>
-                        <input type="text" id="promoCode" placeholder="SUMMER20, IGCSE">
+                        <input type="text" id="promoCode" placeholder="SUMMER20">
                     </div>
                 </div>
                 
-                <div class="quantity-row">
+                <div class="quantity-section">
                     <label>Quantity (1-10)</label>
-                    <div class="quantity-input">
+                    <div class="quantity-buttons">
                         <button type="button" class="qty-btn" id="qtyMinus">-</button>
-                        <span id="quantityDisplay">1</span>
+                        <input type="number" id="quantity" value="1" min="1" max="10" readonly>
                         <button type="button" class="qty-btn" id="qtyPlus">+</button>
-                        <input type="range" id="quantitySlider" min="1" max="10" value="1" class="quantity-slider">
                     </div>
                 </div>
 
-                <div class="photo-upload-row">
-                    <div class="photo-upload" data-side="front">
+                <!-- BIG PHOTO UPLOAD AREAS -->
+                <div class="photo-section">
+                    <div class="photo-upload-area" id="frontUpload">
                         <input type="file" id="frontPhoto" accept="image/*" required>
-                        <div class="upload-placeholder">
+                        <div class="upload-box">
                             <div class="upload-icon">📷</div>
-                            <h4>Front Design</h4>
-                            <p>Upload your main photo</p>
+                            <h3>FRONT PHOTO</h3>
+                            <p>Click anywhere to upload</p>
                         </div>
                         <img id="frontPreview" class="photo-preview">
+                        <div class="upload-status" id="frontStatus"></div>
                     </div>
-                    <div class="photo-upload" data-side="back">
+                    
+                    <div class="photo-upload-area" id="backUpload">
                         <input type="file" id="backPhoto" accept="image/*" required>
-                        <div class="upload-placeholder">
+                        <div class="upload-box">
                             <div class="upload-icon">📷</div>
-                            <h4>Back Design</h4>
-                            <p>Upload your back photo</p>
+                            <h3>BACK PHOTO</h3>
+                            <p>Click anywhere to upload</p>
                         </div>
                         <img id="backPreview" class="photo-preview">
+                        <div class="upload-status" id="backStatus"></div>
                     </div>
                 </div>
 
-                <div class="order-summary">
-                    <div class="summary-item">
-                        <span>Subtotal</span>
+                <div class="pricing-section">
+                    <div class="price-row">
+                        <span>Subtotal (<span id="qtyDisplay">1</span> × 4 AED)</span>
                         <span id="subtotal">4.00 AED</span>
                     </div>
-                    <div class="summary-item discount" id="discountRow" style="display: none;">
+                    <div class="price-row discount" id="discountRow" style="display: none;">
                         <span>Discount</span>
-                        <span id="discountAmount">-0.00 AED</span>
+                        <span id="discount">0.00 AED</span>
                     </div>
-                    <div class="summary-total">
-                        <span>Total</span>
-                        <span id="totalAmount">4.00 AED</span>
+                    <div class="price-row total">
+                        <span>TOTAL</span>
+                        <span id="total">4.00 AED</span>
                     </div>
                 </div>
 
-                <button type="submit" class="submit-button" id="submitBtn">
+                <button type="submit" class="order-btn" id="submitBtn">
                     <span>Place Order</span>
-                    <div class="button-loader"></div>
+                    <div class="loader"></div>
                 </button>
             </form>
         </div>
     </section>
 
-    <!-- PROFESSIONAL RECEIPT MODAL -->
+    <!-- PROFESSIONAL RECEIPT -->
     <div id="receiptModal" class="receipt-modal">
-        <div class="receipt-container">
-            <div class="receipt-header">
-                <div class="receipt-logo">KeyCraft</div>
-                <div class="receipt-title">Order Receipt</div>
-                <div class="order-number" id="orderNumber">ORDER #123</div>
+        <div class="receipt-card">
+            <div class="receipt-top">
+                <h1>KeyCraft</h1>
+                <div class="order-id" id="orderId">#1001</div>
             </div>
-            
-            <div class="receipt-body">
-                <div class="customer-info">
-                    <div class="info-row">
-                        <span>Customer:</span>
-                        <span id="receiptName">John Doe</span>
+            <div class="receipt-content">
+                <div class="customer-section">
+                    <h3>Customer Details</h3>
+                    <div class="info-line">
+                        <span>Name:</span>
+                        <span id="receiptCustomer"></span>
                     </div>
-                    <div class="info-row">
+                    <div class="info-line">
                         <span>Email:</span>
-                        <span id="receiptEmail">john@example.com</span>
+                        <span id="receiptEmail"></span>
                     </div>
-                    <div class="info-row">
+                    <div class="info-line">
                         <span>Phone:</span>
-                        <span id="receiptPhone">-</span>
+                        <span id="receiptPhone"></span>
                     </div>
                 </div>
-
-                <div class="order-details">
+                
+                <div class="order-section">
+                    <h3>Order Summary</h3>
                     <div class="order-item">
-                        <div class="item-desc">
-                            <div>Custom Photo Keychain (3×4.78cm)</div>
-                            <div class="item-meta">Premium acrylic, double-sided</div>
-                        </div>
-                        <div class="item-qty">x <span id="receiptQuantity">1</span></div>
-                        <div class="item-price">4.00 AED</div>
+                        <div>Custom Keychains × <span id="receiptQty">1</span></div>
+                        <div class="price-right" id="receiptSubtotal">4.00 AED</div>
+                    </div>
+                    <div class="order-item discount" id="receiptDiscountRow" style="display: none;">
+                        <div>Discount</div>
+                        <div class="price-right" id="receiptDiscount">0.00 AED</div>
+                    </div>
+                    <div class="order-total">
+                        <div>TOTAL</div>
+                        <div class="price-right" id="receiptTotal">4.00 AED</div>
                     </div>
                 </div>
 
-                <div class="receipt-pricing">
-                    <div class="price-row">
-                        <span>Subtotal</span>
-                        <span id="receiptSubtotal">4.00 AED</span>
-                    </div>
-                    <div class="price-row discount" id="receiptDiscountRow" style="display: none;">
-                        <span>Discount</span>
-                        <span id="receiptDiscount">-0.00 AED</span>
-                    </div>
-                    <div class="price-row total">
-                        <span>Total</span>
-                        <span id="receiptTotal">4.00 AED</span>
-                    </div>
-                </div>
-
-                <div class="receipt-photos">
-                    <h4>Design Preview</h4>
-                    <div class="photo-pair">
-                        <div class="photo-container">
-                            <div class="photo-label">Front</div>
-                            <img id="receiptFrontPhoto" alt="Front design">
+                <div class="photos-section">
+                    <h3>Photo Preview</h3>
+                    <div class="photo-grid">
+                        <div class="photo-cell">
+                            <div class="photo-label">FRONT</div>
+                            <img id="receiptFront">
                         </div>
-                        <div class="photo-container">
-                            <div class="photo-label">Back</div>
-                            <img id="receiptBackPhoto" alt="Back design">
+                        <div class="photo-cell">
+                            <div class="photo-label">BACK</div>
+                            <img id="receiptBack">
                         </div>
                     </div>
-                </div>
-
-                <div class="receipt-footer">
-                    <p>Thank you for your order! We'll process within 24 hours.</p>
-                    <p>KeyCraft • Sharjah, UAE</p>
                 </div>
             </div>
-
             <div class="receipt-actions">
-                <button onclick="downloadReceipt()" class="action-primary">Download PDF Receipt</button>
-                <button onclick="closeReceipt()" class="action-secondary">Place New Order</button>
+                <button onclick="downloadPDF()" class="pdf-btn">📄 Download PDF</button>
+                <button onclick="closeModal()" class="close-btn">New Order</button>
             </div>
         </div>
     </div>
