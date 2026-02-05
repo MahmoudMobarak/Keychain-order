@@ -1,7 +1,11 @@
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
+diff --git a/index.html b/index.html
+index 9f580ce9a04bc516ec27bd03835ff5328b4e49ea..21f291f977a9b98ea39219eb67dfe77fc1bef85a 100644
+--- a/index.html
++++ b/index.html
+@@ -1,143 +1,111 @@
+ <!DOCTYPE html>
+ <html lang="en">
+ <head>
 -    <meta charset="UTF-8">
 -    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 -    <title>Enterprise | Premium Custom Keychains</title>
@@ -17,8 +21,8 @@
 +  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 +  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 +  <link rel="stylesheet" href="style.css">
-</head>
-<body>
+ </head>
+ <body>
 +  <header class="site-header">
 +    <div class="container nav-wrap">
 +      <div class="brand">Enterprise</div>
@@ -28,7 +32,7 @@
 +      </nav>
 +    </div>
 +  </header>
-
+ 
 -    <nav class="glass-nav">
 -        <div class="nav-content">
 -            <span class="logo">ENTERPRISE<span class="dot">.</span></span>
@@ -57,7 +61,7 @@
 +          <h1>Custom Keychain.<br>Simple. Personal. Apple‑inspired.</h1>
 +          <p class="lead">Your design on both sides of a premium acrylic keychain. Size: 3 × 4.78 cm. Price: 4 AED each.</p>
 +          <button class="primary-btn" data-scroll="order">Order now</button>
-     </div>
+         </div>
 -        <div class="hero-visual reveal delay-1">
 -            <div class="floating-keychain">
 -                <div class="keychain-inner"><span>3cm x 4.78cm</span></div>
@@ -69,10 +73,10 @@
 +            <div class="plate"></div>
 +          </div>
 +          <p>Upload front + back photos</p>
-     </div>
+         </div>
 +      </div>
- </section>
-
+     </section>
+ 
 -    <section id="specs" class="snap-section dark-mode">
 -        <div class="specs-header reveal">
 -            <h2>Technical Precision</h2>
@@ -108,7 +112,7 @@
 +              <input type="tel" id="customer-phone" placeholder="+971 50 000 0000">
 +            </label>
 +          </div>
-
+ 
 -    <section id="order" class="snap-section">
 -        <div class="order-container reveal">
 -            <div class="form-header">
@@ -139,7 +143,7 @@
 +              <small id="promo-message"></small>
 +            </label>
 +          </div>
-
+ 
 -                <div class="form-grid">
 -                    <div class="input-group">
 -                        <label>Quantity (Max 10)</label>
@@ -161,7 +165,7 @@
 +              <input type="file" id="back-photo" accept="image/*" required>
 +            </label>
 +          </div>
-
+ 
 -                <div class="file-upload-section">
 -                    <div class="file-box">
 -                        <label>Front Image</label>
@@ -177,7 +181,7 @@
 +            <p><span>Discount</span><span id="discount-total">-0.00 AED</span></p>
 +            <p class="total"><span>Total</span><span id="total-price">4.00 AED</span></p>
 +          </div>
-
+ 
 -                <div class="price-dock">
 -                    <div class="price-row">
 -                        <span>Total Price</span>
@@ -195,9 +199,9 @@
 +          <p id="form-error" class="error"></p>
 +        </form>
 +      </div>
- </section>
+     </section>
 +  </main>
-
+ 
 -    <div id="receipt-modal" class="modal hidden">
 -        <div class="modal-content">
 -            <div class="success-icon">✓</div>
@@ -223,13 +227,13 @@
 +        <p class="total"><span>Total</span><span id="receipt-total"></span></p>
 +      </div>
 +      <button id="download-pdf" class="secondary-btn">Download receipt PDF</button>
- </div>
+     </div>
 +  </div>
-
+ 
 -    <script src="script.js"></script>
 +  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 +  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 +  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 +  <script src="script.js"></script>
-</body>
-</html>
+ </body>
+ </html>
