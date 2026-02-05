@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Custom IGCSE Enterprise Keychain</title>
+  <title>Enterprise Keychain – Order</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
 </head>
@@ -10,63 +10,107 @@
   <header class="site-header">
     <div class="logo">Enterprise Keychain</div>
     <nav class="nav">
+      <button class="nav-btn" data-target="hero-section">Home</button>
       <button class="nav-btn" data-target="product-section">Product</button>
       <button class="nav-btn" data-target="order-section">Order</button>
     </nav>
   </header>
 
   <main>
-    <!-- PRODUCT PAGE -->
-    <section id="product-section" class="page-section active">
-      <h1>Minimalist Custom Keychain</h1>
-      <p>
-        This **keychain** is our IGCSE Enterprise project product. It is compact, durable, and designed to be a simple daily accessory.
-      </p>
-      <ul class="product-details">
-        <li>Dimensions: 3 cm × 4.78 cm.</li>
-        <li>Price: 4 AED per keychain.</li>
-        <li>Customizable front and back design using your own images.</li>
-      </ul>
-      <p>
-        Perfect for school bags, keys, or as a small gift. Order up to 10 pieces at once and apply promo codes when available.
-      </p>
-      <button class="primary-btn" data-target="order-section">Order now</button>
+    <!-- HERO / ADVERTISING -->
+    <section id="hero-section" class="page-section active hero">
+      <div class="hero-content">
+        <h1>Minimalist Keychain, Maximum Identity.</h1>
+        <p>
+          A clean, modern keychain designed as part of our IGCSE Enterprise project – made to look like a real product from a real brand.
+        </p>
+        <ul>
+          <li>3 cm × 4.78 cm premium acrylic body.</li>
+          <li>Front and back fully customizable with your images.</li>
+          <li>Flat 4 AED per keychain, bulk up to 10 pieces.</li>
+        </ul>
+        <button class="primary-btn" data-target="order-section">Order now</button>
+      </div>
+      <div class="hero-card">
+        <h2>Why this keychain?</h2>
+        <p>Slim design, durable finish, and a clean look that fits school, work, and everyday carry.</p>
+        <p>Designed, tested, and sold by students – you support our project with every order.</p>
+      </div>
     </section>
 
-    <!-- ORDER PAGE -->
+    <!-- DETAILED PRODUCT SECTION -->
+    <section id="product-section" class="page-section">
+      <h2>The Product</h2>
+      <div class="product-grid">
+        <div>
+          <h3>Design</h3>
+          <p>
+            The keychain uses a simple rectangular layout so your design is always clear and easy to read.
+          </p>
+          <ul class="product-details">
+            <li>Dimensions: 3 cm × 4.78 cm.</li>
+            <li>Material: clear acrylic with printed insert.</li>
+            <li>Finish: smooth edges, minimalist look.</li>
+          </ul>
+        </div>
+        <div>
+          <h3>Price & value</h3>
+          <p>
+            One flat price: 4 AED per keychain. No hidden fees, even when you customize both sides.
+          </p>
+          <ul class="product-details">
+            <li>Flat 4 AED per keychain.</li>
+            <li>Order up to 10 at once.</li>
+            <li>Promo codes available for special discounts.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ORDER FORM SECTION -->
     <section id="order-section" class="page-section">
       <h2>Place Your Order</h2>
       <form id="order-form">
-        <div class="form-group">
-          <label for="customer-email">Your email (for receipt and updates)</label>
-          <input type="email" id="customer-email" required placeholder="you@example.com">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="customer-name">Your name</label>
+            <input type="text" id="customer-name" required placeholder="Your full name">
+          </div>
+          <div class="form-group">
+            <label for="customer-email">Your email (for receipt and updates)</label>
+            <input type="email" id="customer-email" required placeholder="you@example.com">
+          </div>
         </div>
 
-        <div class="form-group">
-          <label for="customer-phone">Phone number (optional)</label>
-          <input type="tel" id="customer-phone" placeholder="+9715XXXXXXXX">
-        </div>
-
-        <div class="form-group">
-          <label for="item-quantity">Quantity (1–10)</label>
-          <input type="number" id="item-quantity" min="1" max="10" value="1" required>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="customer-phone">Phone number (optional)</label>
+            <input type="tel" id="customer-phone" placeholder="+9715XXXXXXXX">
+          </div>
+          <div class="form-group">
+            <label for="item-quantity">Quantity (1–10)</label>
+            <input type="number" id="item-quantity" min="1" max="10" value="1" required>
+          </div>
         </div>
 
         <div class="form-group">
           <label for="promo-code">Promo code (optional)</label>
-          <input type="text" id="promo-code" placeholder="Enter promo code">
-          <button type="button" id="apply-promo-btn" class="secondary-btn">Apply</button>
+          <div class="inline">
+            <input type="text" id="promo-code" placeholder="Enter promo code">
+            <button type="button" id="apply-promo-btn" class="secondary-btn">Apply</button>
+          </div>
           <div id="promo-message" class="info-text"></div>
         </div>
 
-        <div class="form-group">
-          <label>Front photo (required)</label>
-          <input type="file" id="front-photo" accept="image/*" required>
-        </div>
-
-        <div class="form-group">
-          <label>Back photo (required)</label>
-          <input type="file" id="back-photo" accept="image/*" required>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Front photo (required)</label>
+            <input type="file" id="front-photo" accept="image/*" required>
+          </div>
+          <div class="form-group">
+            <label>Back photo (required)</label>
+            <input type="file" id="back-photo" accept="image/*" required>
+          </div>
         </div>
 
         <div class="summary">
@@ -86,6 +130,7 @@
       <button class="modal-close" id="close-receipt">×</button>
       <h2>Order receipt</h2>
       <p><strong>Order number:</strong> <span id="receipt-order-id"></span></p>
+      <p><strong>Name:</strong> <span id="receipt-name"></span></p>
       <p><strong>Email:</strong> <span id="receipt-email"></span></p>
       <p><strong>Phone:</strong> <span id="receipt-phone"></span></p>
       <p><strong>Quantity:</strong> <span id="receipt-quantity"></span></p>
@@ -96,7 +141,17 @@
     </div>
   </div>
 
+  <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- jsPDF for receipt -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <!-- EmailJS (browser SDK) -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script>
+    emailjs.init({
+      publicKey: "YOUR_EMAILJS_PUBLIC_KEY"
+    });
+  </script>
   <script src="script.js"></script>
 </body>
 </html>
