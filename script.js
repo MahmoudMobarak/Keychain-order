@@ -6,72 +6,137 @@ const EMAILJS_TEMPLATE_CUSTOMER = "template_hu5h00o";
 const EMAILJS_TEMPLATE_ADMIN = "template_i0rlm7u";
 
 const { createClient } = supabase;
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// Initialize EmailJS
 emailjs.init(EMAILJS_SERVICE_ID);
 
-const PROMO_CODES = {
-    'SUMMER20': 0.20,
-    'STUDENT10': 0.10,
-    'FIRSTORDER': 0.15,
-    'IGCSE': 0.25
-};
+const PROMO_CODES = { 'SUMMER20': 0.2, 'STUDENT10': 0.1, 'FIRSTORDER': 0.15, 'IGCSE': 0.25 };
 
 let frontPhotoFile = null;
 let backPhotoFile = null;
 let currentOrderId = null;
 
-// DOM Elements
-document.addEventListener('DOMContentLoaded', function() {
-    const orderForm = document.getElementById('orderForm');
-    const quantitySlider = document.getElementById('quantity');
-    const qtyDisplay = document.getElementById('qtyDisplay');
-    const quantityText = document.getElementById('quantity');
-    const promoInput = document.getElementById('promoCode');
+// Initialize
+document.addEventListener('DOMContentLoaded', () => {
+    initCanvasBackground();
+    initScrollAnimations();
+    initNavigation();
+    initQuantityControls();
+    initForm();
+    updatePricing();
+});
+
+function initCanvasBackground() {
+    const canvas = document.getElementById('bgCanvas');
+    const ctx = canvas.getContext('2d');
     
-    // Navigation
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    
+    window.addEventListener('resize', () => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    });
+    
+    const particles = [];
+    for (let i = 0; i < 80; i++) {
+        particles.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            vx: (Math.random() - 0.5) * 0.5,
+            vy: (Math.random() - 0.5) * 0.5,
+            radius: Math.random() * 2 + 0.5
+        });
+    }
+    
+    function animate() {
+        ctx.fillStyle = 'rgba(10, 10, 10, 0.1)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        particles.forEach(p => {
+            p.x += p.vx;
+            p.y += p.vy;
+            
+            if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+            if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+            
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(0, 212, 255, ${0.3 - p.radius * 0.1})`;
+            ctx.fill();
+        });
+        
+        requestAnimationFrame(animate);
+    }
+    animate();
+}
+
+function initScrollAnimations() {
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, { threshold: 0.1 });
+    
+    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+}
+
+function initNavigation() {
     document.querySelectorAll('.nav-link').forEach(link => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
-            const target = document.querySelector(link.getAttribute('href'));
-            target.scrollIntoView({ behavior: 'smooth' });
+            const targetId = link.getAttribute('href').substring(1);
+            document.getElementById(targetId).scrollIntoView({ behavior: 'smooth' });
             document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
             link.classList.add('active');
         });
     });
+}
 
-    // Quantity slider
-    quantitySlider.addEventListener('input', updatePricing);
-    promoInput.addEventListener('input', updatePricing);
+function initQuantityControls() {
+    document.getElementById('qtyMinus').addEventListener('click', () => {
+        let qty = parseInt(document.getElementById('quantity').value);
+        if (qty > 1) {
+            document.getElementById('quantity').value = qty - 1;
+            updatePricing();
+        }
+    });
+    
+    document.getElementById('qtyPlus').addEventListener('click', () => {
+        let qty = parseInt(document.getElementById('quantity').value);
+        if (qty < 10) {
+            document.getElementById('quantity').value = qty + 1;
+            updatePricing();
+        }
+    });
+    
+    document.getElementById('quantity').addEventListener('input', updatePricing);
+    document.getElementById('promoCode').addEventListener('input', updatePricing);
+}
 
-    // File uploads
+function initForm() {
     document.getElementById('frontPhoto').addEventListener('change', handlePhotoUpload);
     document.getElementById('backPhoto').addEventListener('change', handlePhotoUpload);
-
-    // Form submission
-    orderForm.addEventListener('submit', handleOrderSubmit);
-
-    updatePricing();
-});
+    
+    document.getElementById('orderForm').addEventListener('submit', handleOrderSubmit);
+}
 
 function handlePhotoUpload(e) {
     const file = e.target.files[0];
     if (!file || !file.type.startsWith('image/')) return;
-
+    
     const reader = new FileReader();
-    reader.onload = (e) => {
+    reader.onload = (ev) => {
         const preview = e.target.id === 'frontPhoto' ? 
             document.getElementById('frontPreview') : 
             document.getElementById('backPreview');
-        const zone = e.target.id === 'frontPhoto' ? 
-            document.getElementById('frontZone') : 
-            document.getElementById('backZone');
-            
-        preview.src = e.target.result;
-        preview.style.display = 'block';
-        zone.classList.add('has-image');
-
+        const card = e.target.closest('.upload-card');
+        
+        preview.src = ev.target.result;
+        card.classList.add('has-image');
+        
         if (e.target.id === 'frontPhoto') {
             frontPhotoFile = file;
         } else {
@@ -83,10 +148,7 @@ function handlePhotoUpload(e) {
 
 function updatePricing() {
     const qty = parseInt(document.getElementById('quantity').value);
-    const promoCode = document.getElementById('promoCode').value.toUpperCase();
-    
-    document.getElementById('qtyDisplay').textContent = qty;
-    document.getElementById('quantity').nextElementSibling.querySelector('.quantity-display').textContent = `${qty} Keychain${qty > 1 ? 's' : ''} - ${qty * 4} AED`;
+    const promoCode = document.getElementById('promoCode').value.toUpperCase().trim();
     
     const subtotal = qty * 4;
     let discount = 0;
@@ -115,64 +177,59 @@ async function handleOrderSubmit(e) {
         promoCode: document.getElementById('promoCode').value.toUpperCase().trim()
     };
 
-    // Validation
     if (!formData.name || !formData.email || !frontPhotoFile || !backPhotoFile) {
-        alert('Please fill all required fields and upload both photos.');
+        alert('Please complete all fields and upload both photos.');
         return;
     }
 
-    if (!validateEmail(formData.email)) {
-        alert('Please enter a valid email address.');
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+        alert('Please enter a valid email.');
         return;
     }
 
     const submitBtn = document.getElementById('submitBtn');
-    const loader = submitBtn.querySelector('.loader');
-    const btnText = submitBtn.querySelector('span');
-    
+    const loader = document.querySelector('.loader');
+    const btnText = submitBtn.firstChild;
+
     submitBtn.disabled = true;
     loader.style.display = 'block';
     btnText.textContent = 'Processing...';
 
     try {
-        // Calculate pricing
-        const basePrice = 4;
-        const subtotal = basePrice * formData.quantity;
-        let discountAmount = 0;
-        
-        if (PROMO_CODES[formData.promoCode]) {
-            discountAmount = subtotal * PROMO_CODES[formData.promoCode];
-        }
-        
-        const totalPrice = subtotal - discountAmount;
+        const subtotal = formData.quantity * 4;
+        const discount = PROMO_CODES[formData.promoCode] ? subtotal * PROMO_CODES[formData.promoCode] : 0;
+        const total = subtotal - discount;
 
         // Upload photos
         const timestamp = Date.now();
-        const frontPath = `order_${timestamp}_front.jpg`;
-        const backPath = `order_${timestamp}_back.jpg`;
+        const frontPath = `${timestamp}_front.jpg`;
+        const backPath = `${timestamp}_back.jpg`;
 
-        const frontUpload = await supabase.storage
+        const frontUpload = await supabaseClient.storage
             .from('order-photos')
-            .upload(frontPath, frontPhotoFile, { upsert: true });
+            .upload(frontPath, frontPhotoFile);
 
-        const backUpload = await supabase.storage
+        const backUpload = await supabaseClient.storage
             .from('order-photos')
-            .upload(backPath, backPhotoFile, { upsert: true });
+            .upload(backPath, backPhotoFile);
 
-        if (frontUpload.error) throw new Error('Front photo upload failed');
-        if (backUpload.error) throw new Error('Back photo upload failed');
+        if (frontUpload.error || backUpload.error) {
+            throw new Error('Photo upload failed');
+        }
 
         // Save order
-        const { data: order, error } = await supabase
+        const { data: order, error } = await supabaseClient
             .from('orders')
             .insert([{
                 customer_name: formData.name,
                 customer_email: formData.email,
                 phone: formData.phone || null,
-                items: [{ quantity: formData.quantity, price: basePrice }],
+                items: [{ quantity: formData.quantity, price: 4 }],
                 promo_code: formData.promoCode || null,
-                discount_amount: discountAmount,
-                total_price_aed: totalPrice
+                discount_amount: discount,
+                total_price_aed: total,
+                front_photo_path: frontPath,
+                back_photo_path: backPath
             }])
             .select('id')
             .single();
@@ -181,62 +238,23 @@ async function handleOrderSubmit(e) {
 
         currentOrderId = order.id;
 
-        // Send emails (optional - won't break if EmailJS not configured)
-        try {
-            await sendCustomerEmail(formData, totalPrice, discountAmount);
-            await sendAdminEmail(formData, totalPrice, discountAmount, order.id);
-        } catch (emailError) {
-            console.warn('Email sending failed:', emailError);
-        }
-
         // Show receipt
-        showReceipt(formData, totalPrice, order.id);
+        showReceipt(formData, total, order.id);
 
     } catch (error) {
-        console.error('Order error:', error);
-        alert(`Order failed: ${error.message}`);
+        console.error(error);
+        alert('Order failed: ' + error.message);
     } finally {
         submitBtn.disabled = false;
         loader.style.display = 'none';
-        btnText.textContent = 'Place Secure Order';
+        btnText.textContent = 'Place Order';
     }
 }
 
-function validateEmail(email) {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-}
-
-async function sendCustomerEmail(formData, totalPrice, discountAmount) {
-    const params = {
-        to_name: formData.name,
-        to_email: formData.email,
-        order_id: currentOrderId,
-        quantity: formData.quantity,
-        total: totalPrice.toFixed(2),
-        discount: discountAmount > 0 ? `${(discountAmount/(totalPrice+discountAmount)*100).toFixed(0)}%` : 'None'
-    };
-    return emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_CUSTOMER, params);
-}
-
-async function sendAdminEmail(formData, totalPrice, discountAmount, orderId) {
-    const params = {
-        customer_name: formData.name,
-        customer_email: formData.email,
-        customer_phone: formData.phone || 'N/A',
-        quantity: formData.quantity,
-        total: totalPrice.toFixed(2),
-        order_id: orderId,
-        promo_code: formData.promoCode || 'None'
-    };
-    return emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ADMIN, params);
-}
-
-function showReceipt(formData, totalPrice, orderId) {
+function showReceipt(formData, total, orderId) {
     document.getElementById('receiptName').textContent = formData.name;
     document.getElementById('receiptEmail').textContent = formData.email;
-    document.getElementById('receiptPhone').textContent = formData.phone || 'Not provided';
-    document.getElementById('receiptQuantity').textContent = formData.quantity;
-    document.getElementById('receiptTotal').textContent = `${totalPrice.toFixed(2)} AED`;
+    document.getElementById('receiptTotal').textContent = `${total.toFixed(2)} AED`;
     document.getElementById('orderNumber').textContent = `#${orderId}`;
     document.getElementById('receiptFront').src = URL.createObjectURL(frontPhotoFile);
     document.getElementById('receiptBack').src = URL.createObjectURL(backPhotoFile);
@@ -247,11 +265,8 @@ function showReceipt(formData, totalPrice, orderId) {
 function closeReceipt() {
     document.getElementById('receiptModal').style.display = 'none';
     document.getElementById('orderForm').reset();
-    // Reset uploads
-    document.querySelectorAll('.upload-zone').forEach((zone, i) => {
-        zone.classList.remove('has-image');
-        zone.querySelector('.upload-preview').style.display = 'none';
-        zone.querySelector('.upload-content').style.display = 'block';
+    document.querySelectorAll('.upload-card').forEach(card => {
+        card.classList.remove('has-image');
     });
     frontPhotoFile = null;
     backPhotoFile = null;
@@ -264,17 +279,17 @@ async function downloadPDF() {
     const doc = new jsPDF();
     
     try {
-        await html2canvas(receipt, {
+        const canvas = await html2canvas(receipt, {
             scale: 2,
             useCORS: true,
             backgroundColor: '#ffffff'
-        }).then(canvas => {
-            const imgData = canvas.toDataURL('image/png');
-            doc.addImage(imgData, 'PNG', 10, 10, 190, 277);
-            doc.save(`keycraft-order-${currentOrderId}.pdf`);
         });
-    } catch (error) {
-        console.error('PDF generation failed:', error);
-        alert('PDF download failed. Please try again.');
+        
+        const imgData = canvas.toDataURL('image/png');
+        doc.addImage(imgData, 'PNG', 10, 10, 190, 277);
+        doc.save(`keycraft-order-${currentOrderId}.pdf`);
+    } catch (e) {
+        console.error('PDF failed:', e);
+        alert('PDF download failed');
     }
 }
