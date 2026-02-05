@@ -4,280 +4,243 @@ const EMAILJS_PUBLIC_KEY = "wFE7Ll5cDKSxM4Zfs";
 const EMAILJS_SERVICE_ID = "service_zlh57wd";
 const EMAILJS_TEMPLATE_CUSTOMER = "template_hu5h00o";
 const EMAILJS_TEMPLATE_ADMIN = "template_i0rlm7u";
-const ADMIN_NOTIFY_EMAIL = "mahmoudmobarak28.11@gmail.com";
-const PRICE_PER_ITEM = 4;
+const ADMIN_PASSWORD = '123';
 
-const supabaseClient = window.supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_ANON_KEY
-);
+const { createClient } = supabase;
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-window.emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+// Initialize EmailJS
+emailjs.init(EMAILJS_SERVICE_ID);
 
-const form = document.getElementById("order-form");
-const qtyInput = document.getElementById("item-quantity");
-const promoInput = document.getElementById("promo-code");
-const promoMessage = document.getElementById("promo-message");
-const formError = document.getElementById("form-error");
-const submitBtn = document.getElementById("submit-btn");
+// Promo codes (discounts)
+const PROMO_CODES = {
+    'SUMMER20': 0.2,  // 20% off
+    'STUDENT10': 0.1, // 10% off
+    'FIRSTORDER': 0.15 // 15% off
+};
 
-const baseTotalEl = document.getElementById("base-total");
-const discountTotalEl = document.getElementById("discount-total");
-const totalPriceEl = document.getElementById("total-price");
+let currentOrderId = null;
+let frontPhotoFile = null;
+let backPhotoFile = null;
 
-let appliedPromo = null;
+// DOM Elements
+const orderForm = document.getElementById('orderForm');
+const submitBtn = document.getElementById('submitBtn');
+const loader = document.getElementById('loader');
+const navLinks = document.querySelectorAll('.nav-link');
+const uploadAreas = document.querySelectorAll('.upload-area');
 
-for (const trigger of document.querySelectorAll("[data-scroll]")) {
-  trigger.addEventListener("click", () => {
-    const target = document.getElementById(trigger.dataset.scroll);
-    if (target) {
-      target.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-  });
-}
-
-function updateTotal() {
-  const quantity = Math.min(
-    Math.max(parseInt(qtyInput.value || "1", 10), 1),
-    10
-  );
-
-  qtyInput.value = quantity;
-
-  const baseTotal = quantity * PRICE_PER_ITEM;
-  let discount = 0;
-
-  if (appliedPromo) {
-    discount =
-      appliedPromo.discount_type === "percent"
-        ? (baseTotal * appliedPromo.discount_value) / 100
-        : Number(appliedPromo.discount_value || 0);
-
-    discount = Math.max(0, Math.min(discount, baseTotal));
-  }
-
-  const finalTotal = baseTotal - discount;
-
-  baseTotalEl.textContent = `${baseTotal.toFixed(2)} AED`;
-  discountTotalEl.textContent = `-${discount.toFixed(2)} AED`;
-  totalPriceEl.textContent = `${finalTotal.toFixed(2)} AED`;
-
-  return { quantity, baseTotal, discount, finalTotal };
-}
-
-qtyInput.addEventListener("input", updateTotal);
-
-async function applyPromo() {
-  const code = promoInput.value.trim();
-  appliedPromo = null;
-  promoMessage.textContent = "";
-
-  if (!code) {
-    promoMessage.textContent = "Enter a promo code.";
-    promoMessage.className = "error";
-    updateTotal();
-    return;
-  }
-
-  const { data, error } = await supabaseClient
-    .from("promo_codes")
-    .select("code, description, discount_type, discount_value")
-    .eq("code", code)
-    .eq("active", true)
-    .maybeSingle();
-
-  if (error || !data) {
-    promoMessage.textContent = "Invalid promo code.";
-    promoMessage.className = "error";
-    updateTotal();
-    return;
-  }
-
-  appliedPromo = data;
-  promoMessage.textContent = `Applied: ${data.description || data.code}`;
-  promoMessage.className = "success";
-  updateTotal();
-}
-
-document
-  .getElementById("apply-promo-btn")
-  .addEventListener("click", () => {
-    applyPromo().catch(() => {
-      promoMessage.textContent = "Could not validate promo code.";
-      promoMessage.className = "error";
+// Navigation
+navLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const targetId = link.getAttribute('href').substring(1);
+        document.getElementById(targetId).scrollIntoView({ behavior: 'smooth' });
+        navLinks.forEach(l => l.classList.remove('active'));
+        link.classList.add('active');
     });
-  });
-
-async function uploadPhoto(file, folder) {
-  const fileExt = file.name.split(".").pop();
-  const path = `${folder}/${Date.now()}-${Math.random()
-    .toString(36)
-    .slice(2)}.${fileExt}`;
-
-  const { data, error } = await supabaseClient.storage
-    .from("order-photos")
-    .upload(path, file);
-
-  if (error) throw error;
-  return data.path;
-}
-
-async function sendEmails(order) {
-  const quantity = order.items?.[0]?.quantity || 1;
-  const total = Number(order.total_price_aed || 0).toFixed(2);
-
-  await window.emailjs.send(
-    EMAILJS_SERVICE_ID,
-    EMAILJS_TEMPLATE_CUSTOMER,
-    {
-      to_email: order.customer_email,
-      order_id: order.id,
-      quantity,
-      total_price: `${total} AED`,
-    }
-  );
-
-  await window.emailjs.send(
-    EMAILJS_SERVICE_ID,
-    EMAILJS_TEMPLATE_ADMIN,
-    {
-      to_email: ADMIN_NOTIFY_EMAIL,
-      order_id: order.id,
-      customer_email: order.customer_email,
-      customer_phone: order.phone || "-",
-      quantity,
-      total_price: `${total} AED`,
-      promo_code: order.promo_code || "-",
-    }
-  );
-}
-
-const modal = document.getElementById("receipt-modal");
-const closeBtn = document.querySelector(".close-btn");
-
-function showReceipt(order) {
-  document.getElementById("receipt-order-id").textContent = order.id;
-  document.getElementById("receipt-email").textContent =
-    order.customer_email;
-  document.getElementById("receipt-phone").textContent =
-    order.phone || "-";
-  document.getElementById("receipt-quantity").textContent =
-    order.items?.[0]?.quantity || "1";
-  document.getElementById("receipt-promo").textContent =
-    order.promo_code || "-";
-  document.getElementById(
-    "receipt-total"
-  ).textContent = `${Number(order.total_price_aed || 0).toFixed(
-    2
-  )} AED`;
-
-  modal.classList.add("show");
-  modal.setAttribute("aria-hidden", "false");
-}
-
-closeBtn.addEventListener("click", () => {
-  modal.classList.remove("show");
-  modal.setAttribute("aria-hidden", "true");
 });
 
-modal.addEventListener("click", (event) => {
-  if (event.target === modal) {
-    modal.classList.remove("show");
-    modal.setAttribute("aria-hidden", "true");
-  }
-});
+// File Upload Handling
+document.getElementById('frontPhoto').addEventListener('change', handleFileUpload);
+document.getElementById('backPhoto').addEventListener('change', handleFileUpload);
 
-document
-  .getElementById("download-pdf")
-  .addEventListener("click", () => {
-    if (!window.jspdf) return;
+function handleFileUpload(e) {
+    const file = e.target.files[0];
+    const uploadArea = e.target.closest('.upload-area');
+    
+    if (file && file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            uploadArea.innerHTML = '';
+            uploadArea.appendChild(img);
+            uploadArea.classList.add('has-image');
+            
+            if (e.target.id === 'frontPhoto') {
+                frontPhotoFile = file;
+            } else {
+                backPhotoFile = file;
+            }
+        };
+        reader.readAsDataURL(file);
+    }
+}
 
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
+// Email Validation
+function validateEmail(email) {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+}
 
-    const orderId =
-      document.getElementById("receipt-order-id").textContent;
-    const email =
-      document.getElementById("receipt-email").textContent;
-    const total =
-      document.getElementById("receipt-total").textContent;
-
-    doc.setFontSize(18);
-    doc.text("Enterprise Keychain Receipt", 20, 20);
-    doc.setFontSize(12);
-    doc.text(`Order ID: ${orderId}`, 20, 35);
-    doc.text(`Email: ${email}`, 20, 45);
-    doc.text(`Total: ${total}`, 20, 55);
-    doc.save(`receipt-${orderId}.pdf`);
-  });
-
-form.addEventListener("submit", async (event) => {
-  event.preventDefault();
-  formError.textContent = "";
-
-  const email = document
-    .getElementById("customer-email")
-    .value.trim();
-  const phone = document
-    .getElementById("customer-phone")
-    .value.trim();
-  const frontPhoto =
-    document.getElementById("front-photo").files[0];
-  const backPhoto =
-    document.getElementById("back-photo").files[0];
-
-  if (!email || !frontPhoto || !backPhoto) {
-    formError.textContent = "Please fill all required fields.";
-    return;
-  }
-
-  const { quantity, discount, finalTotal } = updateTotal();
-
-  submitBtn.disabled = true;
-  submitBtn.textContent = "Processing...";
-
-  try {
-    const frontPath = await uploadPhoto(frontPhoto, "front");
-    const backPath = await uploadPhoto(backPhoto, "back");
-
-    const orderPayload = {
-      customer_email: email,
-      phone: phone || null,
-      items: [{ quantity, unit_price: PRICE_PER_ITEM }],
-      promo_code: appliedPromo?.code || null,
-      discount_amount: discount,
-      total_price_aed: finalTotal,
-      front_photo_path: frontPath,
-      back_photo_path: backPath,
+// Form Submission
+orderForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const formData = {
+        name: document.getElementById('customerName').value.trim(),
+        email: document.getElementById('customerEmail').value.trim(),
+        phone: document.getElementById('phone').value.trim(),
+        quantity: parseInt(document.getElementById('quantity').value),
+        promoCode: document.getElementById('promoCode').value.trim().toUpperCase()
     };
 
-    const { data: order, error } = await supabaseClient
-      .from("orders")
-      .insert(orderPayload)
-      .select()
-      .single();
-
-    if (error) throw error;
-
-    try {
-      await sendEmails(order);
-    } catch (emailError) {
-      console.error("Email send failed", emailError);
+    // Validation
+    if (!validateEmail(formData.email)) {
+        alert('Please enter a valid email address.');
+        return;
+    }
+    
+    if (!frontPhotoFile || !backPhotoFile) {
+        alert('Please upload both front and back photos.');
+        return;
     }
 
-    showReceipt(order);
-    form.reset();
-    appliedPromo = null;
-    promoMessage.textContent = "";
-    updateTotal();
-  } catch (error) {
-    console.error(error);
-    formError.textContent =
-      "Order failed. Check Supabase table/storage policies and EmailJS template fields.";
-  } finally {
-    submitBtn.disabled = false;
-    submitBtn.textContent = "Place order";
-  }
+    showLoader(true);
+
+    try {
+        // Calculate price
+        const basePrice = 4; // AED per keychain
+        let totalPrice = basePrice * formData.quantity;
+        let discountAmount = 0;
+
+        // Apply promo code
+        if (PROMO_CODES[formData.promoCode]) {
+            discountAmount = totalPrice * PROMO_CODES[formData.promoCode];
+            totalPrice -= discountAmount;
+        }
+
+        // Upload photos to Supabase Storage
+        const frontPath = `${Date.now()}_front_${frontPhotoFile.name}`;
+        const backPath = `${Date.now()}_back_${backPhotoFile.name}`;
+
+        const frontUpload = await supabase.storage
+            .from('order-photos')
+            .upload(frontPath, frontPhotoFile);
+
+        const backUpload = await supabase.storage
+            .from('order-photos')
+            .upload(backPath, backPhotoFile);
+
+        if (frontUpload.error || backUpload.error) {
+            throw new Error('Photo upload failed');
+        }
+
+        // Insert order to database
+        const { data: order, error: dbError } = await supabase
+            .from('orders')
+            .insert([{
+                customer_name: formData.name,
+                customer_email: formData.email,
+                phone: formData.phone || null,
+                items: [{ quantity: formData.quantity, price: basePrice }],
+                promo_code: formData.promoCode || null,
+                discount_amount: discountAmount,
+                total_price_aed: totalPrice,
+                front_photo_path: frontPath,
+                back_photo_path: backPath
+            }])
+            .select('id')
+            .single();
+
+        if (dbError) throw dbError;
+
+        currentOrderId = order.id;
+
+        // Send emails
+        await sendConfirmationEmail(formData, totalPrice, discountAmount);
+        await sendAdminEmail(formData, totalPrice, discountAmount, order.id);
+
+        // Show receipt
+        showReceipt(formData, totalPrice, discountAmount, order.id);
+        
+    } catch (error) {
+        console.error('Order error:', error);
+        alert('Order failed. Please try again.');
+    } finally {
+        showLoader(false);
+    }
 });
 
-updateTotal();
+async function sendConfirmationEmail(formData, totalPrice, discountAmount) {
+    const templateParams = {
+        to_name: formData.name,
+        to_email: formData.email,
+        order_id: currentOrderId,
+        quantity: formData.quantity,
+        total_price: totalPrice.toFixed(2),
+        discount: discountAmount > 0 ? `${(discountAmount/totalPrice*100).toFixed(0)}%` : 'None'
+    };
+
+    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_CUSTOMER, templateParams);
+}
+
+async function sendAdminEmail(formData, totalPrice, discountAmount, orderId) {
+    const templateParams = {
+        customer_name: formData.name,
+        customer_email: formData.email,
+        customer_phone: formData.phone || 'Not provided',
+        quantity: formData.quantity,
+        total_price: totalPrice.toFixed(2),
+        order_id: orderId,
+        promo_code: formData.promoCode || 'None'
+    };
+
+    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ADMIN, templateParams);
+}
+
+function showReceipt(formData, totalPrice, discountAmount, orderId) {
+    document.getElementById('receiptName').textContent = formData.name;
+    document.getElementById('receiptEmail').textContent = formData.email;
+    document.getElementById('receiptPhone').textContent = formData.phone || 'Not provided';
+    document.getElementById('receiptQty').textContent = formData.quantity;
+    document.getElementById('receiptTotal').textContent = `${totalPrice.toFixed(2)} AED`;
+    document.getElementById('orderNumber').textContent = `#${orderId}`;
+    
+    // Show photo placeholders
+    document.getElementById('receiptPhotos').innerHTML = `
+        <img src="${URL.createObjectURL(frontPhotoFile)}" alt="Front">
+        <img src="${URL.createObjectURL(backPhotoFile)}" alt="Back">
+    `;
+    
+    document.getElementById('receiptModal').style.display = 'flex';
+}
+
+function showLoader(show) {
+    submitBtn.disabled = show;
+    loader.style.display = show ? 'block' : 'none';
+    submitBtn.querySelector('span').textContent = show ? '' : 'Place Order';
+}
+
+function closeModal() {
+    document.getElementById('receiptModal').style.display = 'none';
+    orderForm.reset();
+    document.querySelectorAll('.upload-area').forEach(area => {
+        area.innerHTML = '<input type="file" accept="image/*" required><p>📸 Front/Back Photo</p>';
+        area.classList.remove('has-image');
+    });
+    frontPhotoFile = null;
+    backPhotoFile = null;
+}
+
+function downloadReceipt() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    
+    doc.setFontSize(20);
+    doc.text('Order Receipt', 20, 30);
+    doc.setFontSize(16);
+    doc.text(`Order #${currentOrderId}`, 20, 50);
+    
+    const receipt = document.getElementById('receipt');
+    doc.html(receipt.innerHTML, {
+        callback: function (doc) {
+            doc.save(`order-${currentOrderId}.pdf`);
+        },
+        x: 10,
+        y: 70,
+        width: 190,
+        windowWidth: 800
+    });
+}
