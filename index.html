@@ -18,7 +18,7 @@
             <div class="nav-links">
                 <a href="#hero">Product</a>
                 <a href="#specs">Details</a>
-                <button onclick="scrollToSection('order')" class="nav-btn">Order Now</button>
+                <button onclick="scrollToSection('order')" class="nav-btn">Buy Now</button>
             </div>
         </div>
     </nav>
@@ -27,10 +27,10 @@
         <div class="hero-content reveal">
             <span class="pill-badge">IGCSE Enterprise Project</span>
             <h1>The Keychain, <span class="gradient-text">Perfected.</span></h1>
-            <p class="subtitle">Customizable, durable, and minimalist. Designed to carry what matters most to you for just 4 AED.</p>
+            <p class="subtitle">Minimalist engineering meets personal expression. A high-clarity acrylic canvas for your memories. Only 4 AED.</p>
             <div class="cta-group">
-                <button onclick="scrollToSection('order')" class="primary-btn">Order Now</button>
-                <button onclick="scrollToSection('specs')" class="secondary-btn">See Specs</button>
+                <button onclick="scrollToSection('order')" class="primary-btn">Start Your Order</button>
+                <button onclick="scrollToSection('specs')" class="secondary-btn">View Specs</button>
             </div>
         </div>
         <div class="hero-visual reveal delay-1">
@@ -43,24 +43,24 @@
 
     <section id="specs" class="snap-section dark-mode">
         <div class="specs-header reveal">
-            <h2>Technical Specifications</h2>
-            <p>Built for the IGCSE Enterprise program with quality in mind.</p>
+            <h2>Technical Precision</h2>
+            <p>Every detail calculated for the perfect everyday carry.</p>
         </div>
         <div class="grid-layout">
             <div class="feature-card reveal delay-1">
-                <div class="icon">📐</div>
+                <div class="icon">📏</div>
                 <h3>Exact Dimensions</h3>
-                <p>3cm width and 4.78cm height. Slim enough for pockets, large enough for detail.</p>
+                <p>3cm width and 4.78cm height. Slim enough for pockets, large enough for crystal clear detail.</p>
             </div>
             <div class="feature-card reveal delay-2">
                 <div class="icon">🎨</div>
                 <h3>Fully Custom</h3>
-                <p>Upload any photo for the front and back. We use high-res acrylic protection.</p>
+                <p>Upload any photo for the front and back. We use high-definition protection sheets.</p>
             </div>
             <div class="feature-card reveal delay-3">
                 <div class="icon">💎</div>
                 <h3>Premium Build</h3>
-                <p>Crystal clear casing that is shatter-resistant and lightweight.</p>
+                <p>Crystal clear acrylic casing that is shatter-resistant and incredibly lightweight.</p>
             </div>
         </div>
     </section>
@@ -68,18 +68,18 @@
     <section id="order" class="snap-section">
         <div class="order-container reveal">
             <div class="form-header">
-                <h2>Custom Order Form</h2>
-                <p>Fill in your details to create your custom keychain.</p>
+                <h2>Customization Lab</h2>
+                <p>Upload your photos and enter your delivery info.</p>
             </div>
             
             <form id="orderForm" class="glass-form">
                 <div class="form-grid">
                     <div class="input-group">
-                        <label>Your Email</label>
-                        <input type="email" id="email" required placeholder="name@email.com">
+                        <label>Email (Valid Format Required)</label>
+                        <input type="email" id="email" required placeholder="name@example.com">
                     </div>
                     <div class="input-group">
-                        <label>Phone (Optional)</label>
+                        <label>Phone Number (Optional)</label>
                         <input type="tel" id="phone" placeholder="+971 -- --- ----">
                     </div>
                 </div>
@@ -92,7 +92,7 @@
                     <div class="input-group">
                         <label>Promo Code</label>
                         <div class="promo-row">
-                            <input type="text" id="promo" placeholder="Enter code">
+                            <input type="text" id="promo" placeholder="CODE">
                             <button type="button" onclick="checkPromo()" class="small-btn">Apply</button>
                         </div>
                     </div>
@@ -100,11 +100,11 @@
 
                 <div class="file-upload-section">
                     <div class="file-box">
-                        <label>Front Photo</label>
+                        <label>Front Image</label>
                         <input type="file" id="front-file" accept="image/*" required>
                     </div>
                     <div class="file-box">
-                        <label>Back Photo</label>
+                        <label>Back Image</label>
                         <input type="file" id="back-file" accept="image/*" required>
                     </div>
                 </div>
@@ -115,7 +115,7 @@
                         <span id="final-price" class="big-price">4.00 AED</span>
                     </div>
                     <button type="submit" id="submit-btn" class="buy-btn">
-                        <span id="btn-text">Pay & Order</span>
+                        <span id="btn-text">Pay & Order Now</span>
                         <div id="loader" class="spinner hidden"></div>
                     </button>
                     <p id="error-msg" class="error-text"></p>
@@ -134,7 +134,7 @@
                 <div class="r-row total"><span>Total:</span> <span id="r-total"></span></div>
             </div>
             <button onclick="downloadReceipt()" class="primary-btn full">Download PDF Receipt</button>
-            <button onclick="window.location.reload()" class="link-btn">Close</button>
+            <button onclick="window.location.reload()" class="link-btn">Back to Store</button>
         </div>
     </div>
 
