@@ -8,6 +8,11 @@
   <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
+  <!-- FLOATING COLOR ORBS (alive background) -->
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
   <!-- NAVIGATION -->
   <header class="header">
     <nav class="nav">
@@ -24,11 +29,12 @@
     <!-- HERO SECTION -->
     <section id="hero" class="hero-section">
       <div class="hero-bg"></div>
+      <div class="hero-glow"></div>
       <div class="hero-content">
         <div class="hero-badge">IGCSE Enterprise Project</div>
         <h1 class="hero-title">
           <span class="title-line">Minimalist</span>
-          <span class="title-line">Keychain</span>
+          <span class="title-line glow-text">Keychain</span>
           <span class="title-line sub">Maximum Identity</span>
         </h1>
         <p class="hero-subtitle">Customizable. Durable. 4 AED.</p>
@@ -38,7 +44,7 @@
             <span class="stat-label">CM Dimensions</span>
           </div>
           <div class="stat">
-            <span class="stat-number">4</span>
+            <span class="stat-number accent">4</span>
             <span class="stat-label">AED Each</span>
           </div>
           <div class="stat">
@@ -46,48 +52,58 @@
             <span class="stat-label">Max Order</span>
           </div>
         </div>
-        <button class="cta-primary" data-scroll="order-section">Order Now</button>
+        <button class="cta-primary pulse" data-scroll="order-section">
+          <span>Order Now</span>
+          <div class="ripple"></div>
+        </button>
       </div>
       <div class="hero-scroll-hint">
         <div class="scroll-arrow"></div>
       </div>
     </section>
 
-    <!-- PRODUCT FEATURES SECTION -->
+    <!-- LIVE PRODUCT FEATURES -->
     <section id="product" class="features-section">
       <div class="container">
-        <h2 class="section-title">Designed to Last</h2>
+        <h2 class="section-title accent-glow">Designed to Last</h2>
         <div class="features-grid">
-          <div class="feature-card slide-in" data-delay="100">
+          <div class="feature-card" data-animation="scale">
             <div class="feature-icon">📐</div>
             <h3>Perfect Dimensions</h3>
             <p>3cm × 4.78cm acrylic body. Slim enough for pockets, strong enough for daily use.</p>
+            <div class="feature-glow"></div>
           </div>
-          <div class="feature-card slide-in" data-delay="200">
+          <div class="feature-card" data-animation="float">
             <div class="feature-icon">🎨</div>
             <h3>Fully Customizable</h3>
             <p>Upload your images for front and back. Your design, your style, perfect clarity.</p>
+            <div class="feature-glow"></div>
           </div>
-          <div class="feature-card slide-in" data-delay="300">
+          <div class="feature-card" data-animation="bounce">
             <div class="feature-icon">⚡</div>
             <h3>Flat Pricing</h3>
             <p>4 AED per keychain. Order up to 10 at once. Promo codes available.</p>
+            <div class="feature-glow"></div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- PRODUCT SHOWCASE -->
+    <!-- ANIMATED PRODUCT SHOWCASE -->
     <section class="product-showcase">
-      <div class="product-mockup">
-        <div class="keychain-front"></div>
-        <div class="keychain-back"></div>
-        <div class="keychain-ring"></div>
+      <div class="product-orbit">
+        <div class="keychain-orbit">
+          <div class="keychain-container">
+            <div class="keychain-front"></div>
+            <div class="keychain-back"></div>
+            <div class="keychain-ring"></div>
+          </div>
+        </div>
       </div>
-      <div class="product-info slide-in">
+      <div class="product-info">
         <h2>Your Design, Realized</h2>
         <p>Upload front and back images. We print directly onto premium acrylic. Smooth edges, vibrant colors, built to last.</p>
-        <button class="cta-secondary" data-scroll="order-section">Start Customizing</button>
+        <button class="cta-secondary pulse" data-scroll="order-section">Start Customizing</button>
       </div>
     </section>
 
@@ -120,7 +136,7 @@
             <label>Promo Code</label>
             <div class="promo-input">
               <input type="text" id="promo-code" placeholder="Enter code">
-              <button type="button" id="apply-promo-btn" class="btn-promo">Apply</button>
+              <button type="button" id="apply-promo-btn" class="btn-promo glow">Apply</button>
             </div>
             <div id="promo-message"></div>
           </div>
@@ -134,7 +150,7 @@
               <input type="file" id="back-photo" accept="image/*" required>
             </div>
           </div>
-          <div class="order-summary">
+          <div class="order-summary glow-border">
             <div class="summary-row">
               <span>4 AED × Quantity</span>
               <span id="base-total">4 AED</span>
@@ -148,7 +164,7 @@
               <span id="total-price">4 AED</span>
             </div>
           </div>
-          <button type="submit" class="cta-primary full-width">Place Order</button>
+          <button type="submit" class="cta-primary full-width pulse">Place Order</button>
           <div id="form-error" class="form-error"></div>
         </form>
       </div>
@@ -157,7 +173,7 @@
 
   <!-- RECEIPT MODAL -->
   <div id="receipt-modal" class="modal-overlay">
-    <div class="modal-content">
+    <div class="modal-content glow-border">
       <button class="modal-close">&times;</button>
       <div class="receipt-header">
         <h2>Order Confirmed</h2>
@@ -189,7 +205,7 @@
           <span id="receipt-total"></span>
         </div>
       </div>
-      <button id="download-pdf" class="btn-secondary">Download Receipt</button>
+      <button id="download-pdf" class="btn-secondary pulse">Download Receipt</button>
     </div>
   </div>
 
