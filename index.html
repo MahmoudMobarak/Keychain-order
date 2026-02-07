@@ -34,11 +34,11 @@
         }
         .nav-content { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; padding: 0 2rem; align-items: center; }
 
-        /* --- HERO (HUGE INTRO TEXT) --- */
+        /* --- HERO --- */
         .hero { min-height: 90vh; display: flex; align-items: center; padding: 120px 2rem; background: radial-gradient(circle at top right, #e0e7ff, #f8fafc); }
         .hero-content { max-width: 1200px; margin: 0 auto; width: 100%; }
         .hero h1 { 
-            font-size: clamp(4rem, 12vw, 8.5rem); /* MASSIVE FONT */
+            font-size: clamp(4rem, 12vw, 8.5rem); 
             font-weight: 800; 
             line-height: 0.85; 
             letter-spacing: -5px; 
@@ -61,7 +61,6 @@
         }
         .input-group input:focus { border-color: var(--primary); background: white; outline: none; box-shadow: 0 0 0 6px rgba(99, 102, 241, 0.1); }
 
-        /* Quantity Selector */
         .qty-wrapper { display: flex; align-items: center; justify-content: center; gap: 3rem; margin: 4rem 0; background: #f1f5f9; padding: 1.5rem; border-radius: 35px; }
         .qty-btn { 
             width: 85px; height: 85px; border-radius: 25px; border: none; 
@@ -71,7 +70,6 @@
         .qty-btn:hover { background: var(--primary); color: white; transform: scale(1.1); }
         #qtyText { font-size: 3.5rem; font-weight: 800; min-width: 80px; text-align: center; }
 
-        /* Photo Uploads */
         .upload-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; margin-bottom: 4rem; }
         .upload-box {
             height: 300px; border: 4px dashed #cbd5e1; border-radius: 40px;
@@ -89,7 +87,6 @@
         }
         .submit-btn:hover { transform: translateY(-8px); box-shadow: 0 30px 60px rgba(0,0,0,0.2); background: var(--primary); }
 
-        /* --- CUSTOM POPUP MODAL --- */
         .modal-overlay {
             position: fixed; inset: 0; background: rgba(15, 23, 42, 0.95);
             backdrop-filter: blur(12px); display: none; align-items: center;
@@ -235,7 +232,6 @@
             document.getElementById('totalDisplay').innerText = (qty * 4).toFixed(2) + " AED";
         }
 
-        // Photo Preview Handling
         ['f', 'b'].forEach(x => {
             document.getElementById(`${x}File`).onchange = (e) => {
                 const file = e.target.files[0];
@@ -251,15 +247,17 @@
         document.getElementById('keyForm').onsubmit = async (e) => {
             e.preventDefault();
             const btn = document.getElementById('subBtn');
-            const rawName = document.getElementById('custName').value;
-            const safeName = rawName.replace(/\s+/g,'_').toLowerCase();
+            
+            // --- THE FIX IS HERE ---
+            const rawName = document.getElementById('custName').value || "Guest";
+            const safeName = String(rawName).replace(/\s+/g,'_').toLowerCase();
             const totalPrice = (qty * 4).toFixed(2);
+            // -----------------------
 
             btn.disabled = true;
             btn.innerText = "Processing...";
 
             try {
-                // 1. Database
                 const { data: order, error } = await sb.from('orders').insert([{
                     customer_name: rawName,
                     customer_email: document.getElementById('custEmail').value,
@@ -270,7 +268,6 @@
 
                 if(error) throw error;
 
-                // 2. Storage
                 const fFile = document.getElementById('fFile').files[0];
                 const bFile = document.getElementById('bFile').files[0];
                 const fName = `${safeName}_${order.id}_front.jpg`;
@@ -282,20 +279,17 @@
                 const fUrl = sb.storage.from('order-photos').getPublicUrl(fName).data.publicUrl;
                 const bUrl = sb.storage.from('order-photos').getPublicUrl(bName).data.publicUrl;
 
-                // 3. Update paths
                 await sb.from('orders').update({ front_photo_path: fName, back_photo_path: bName }).eq('id', order.id);
 
-                // 4. Email (Using total_price variable)
                 await emailjs.send(config.ejs_svc, config.ejs_tmp, {
                     cust_name: rawName,
                     cust_email: document.getElementById('custEmail').value,
                     order_id: order.id,
-                    total_price: totalPrice, // MATCHES {{total_price}} in EmailJS
+                    total_price: totalPrice, 
                     front_url: fUrl,
                     back_url: bUrl
                 });
 
-                // 5. Success
                 document.getElementById('rID').innerText = `#${order.id}`;
                 document.getElementById('rName').innerText = rawName;
                 document.getElementById('rQty').innerText = qty;
