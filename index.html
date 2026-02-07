@@ -22,11 +22,9 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
         body { background: var(--bg); color: var(--dark); overflow-x: hidden; scroll-behavior: smooth; }
 
-        /* --- ANIMATIONS --- */
         .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s ease-out; }
         .reveal.active { opacity: 1; transform: translateY(0); }
 
-        /* --- NAVIGATION --- */
         nav {
             position: fixed; top: 0; width: 100%; padding: 1.2rem 0;
             background: rgba(255,255,255,0.7); backdrop-filter: blur(15px);
@@ -34,7 +32,6 @@
         }
         .nav-content { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; padding: 0 2rem; align-items: center; }
 
-        /* --- HERO --- */
         .hero { min-height: 90vh; display: flex; align-items: center; padding: 120px 2rem; background: radial-gradient(circle at top right, #e0e7ff, #f8fafc); }
         .hero-content { max-width: 1200px; margin: 0 auto; width: 100%; }
         .hero h1 { 
@@ -49,7 +46,6 @@
         }
         .hero p { font-size: 1.8rem; color: #64748b; max-width: 700px; font-weight: 400; line-height: 1.4; }
 
-        /* --- FORM --- */
         .order-container { max-width: 1000px; margin: 0 auto; padding: 6rem 2rem; }
         .order-box { background: white; padding: 4rem; border-radius: 50px; box-shadow: 0 40px 100px rgba(0,0,0,0.05); border: 1px solid #f1f5f9; }
         
@@ -169,6 +165,7 @@
                         <img id="bImg">
                     </div>
                 </div>
+
                 <div class="input-group" style="margin-top: 2rem;">
                     <label>Promo Code</label>
                     <div style="display: flex; gap: 10px;">
@@ -176,6 +173,7 @@
                         <button type="button" onclick="applyPromo()" id="promoBtn" style="padding: 0 20px; border-radius: 15px; background: var(--primary); color: white; border: none; font-weight: 700; cursor: pointer;">Apply</button>
                     </div>
                 </div>
+
                 <div style="padding: 3rem; background: #f8fafc; border-radius: 35px; margin-bottom: 3rem; text-align: center;">
                     <div style="font-weight: 800; font-size: 2.5rem;">
                         <span style="color: #64748b; font-size: 1.2rem; display: block; margin-bottom: 0.5rem; text-transform: uppercase;">Final Price</span>
@@ -229,6 +227,8 @@
 
         let activePromo = null;
         let discountInfo = { type: null, value: 0 };
+        window.currentTotal = 4.00;
+        window.currentDiscount = 0;
         
         async function applyPromo() {
             const codeInput = document.getElementById('promoInput').value.trim().toUpperCase();
@@ -262,21 +262,20 @@
             let discountAmount = 0;
         
             if (activePromo) {
-                // Logic for 'percent' vs 'money' from your DB
                 if (discountInfo.type === 'percent') {
                     discountAmount = subtotal * (discountInfo.value / 100);
                 } else {
-                    discountAmount = discountInfo.value; // 'money' type
+                    discountAmount = discountInfo.value;
                 }
             }
         
             const finalTotal = Math.max(0, subtotal - discountAmount);
             document.getElementById('totalDisplay').innerText = finalTotal.toFixed(2) + " AED";
             
-            // Store for the submit function
             window.currentDiscount = discountAmount;
             window.currentTotal = finalTotal;
         }
+
         ['f', 'b'].forEach(x => {
             document.getElementById(`${x}File`).onchange = (e) => {
                 const file = e.target.files[0];
@@ -292,25 +291,21 @@
         document.getElementById('keyForm').onsubmit = async (e) => {
             e.preventDefault();
             const btn = document.getElementById('subBtn');
-            
-            // --- THE FIX IS HERE ---
             const rawName = document.getElementById('custName').value || "Guest";
             const safeName = String(rawName).replace(/\s+/g,'_').toLowerCase();
-            const totalPrice = (qty * 4).toFixed(2);
-            // -----------------------
+            const finalDisplayPrice = window.currentTotal.toFixed(2);
 
             btn.disabled = true;
             btn.innerText = "Processing...";
 
             try {
-                    // Inside your sb.from('orders').insert([...])
                 const { data: order, error } = await sb.from('orders').insert([{
                     customer_name: rawName,
                     customer_email: document.getElementById('custEmail').value,
                     phone: document.getElementById('custPhone').value,
                     promo_code: activePromo,
                     discount_amount: window.currentDiscount || 0,
-                    total_price_aed: window.currentTotal || (qty * 4)
+                    total_price_aed: window.currentTotal
                 }]).select().single();
 
                 if(error) throw error;
@@ -328,13 +323,12 @@
 
                 await sb.from('orders').update({ front_photo_path: fName, back_photo_path: bName }).eq('id', order.id);
 
-                // 3. Send Email
                 await emailjs.send(config.ejs_svc, config.ejs_tmp, {
                     cust_name: rawName,
                     cust_email: document.getElementById('custEmail').value,
                     order_id: order.id,
-                    total_price: totalPrice,
-                    quantity: qty, // Match this to your {{quantity}} tag in EmailJS
+                    total_price: finalDisplayPrice,
+                    quantity: qty,
                     front_url: fUrl,
                     back_url: bUrl
                 });
@@ -342,7 +336,7 @@
                 document.getElementById('rID').innerText = `#${order.id}`;
                 document.getElementById('rName').innerText = rawName;
                 document.getElementById('rQty').innerText = qty;
-                document.getElementById('rTotal').innerText = totalPrice + " AED";
+                document.getElementById('rTotal').innerText = finalDisplayPrice + " AED";
                 document.getElementById('successModal').classList.add('active');
 
             } catch (err) {
@@ -357,7 +351,8 @@
             const element = document.getElementById('receiptContent');
             html2canvas(element).then(canvas => {
                 const imgData = canvas.toDataURL('image/png');
-                const pdf = new jspdf.jsPDF();
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF();
                 pdf.addImage(imgData, 'PNG', 15, 15, 180, 200);
                 pdf.save(`KeyCraft_Receipt_${Date.now()}.pdf`);
             });
