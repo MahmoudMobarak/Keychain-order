@@ -90,29 +90,22 @@
         const CONFIG = {
             SB_URL: "https://pkzvftleoysldqmjdgds.supabase.co",
             SB_KEY: "sb_publishable_H9QIgdBqQZtHXcywZyDsjA_s4fXffjN",
-            ADMIN_PASSWORD_HASH: "-2017042526" // Password is: KeyCraft2026
+            ADMIN_PASSWORD: "KeyCraft2026" // DIRECT PASSWORD SYSTEM
         };
 
         const sb = supabase.createClient(CONFIG.SB_URL, CONFIG.SB_KEY);
 
-        // ESSENTIAL: Simple hashing function to match your password system
-        function simpleHash(str) {
-            let h = 0;
-            for (let i = 0; i < str.length; i++) {
-                h = (h << 5) - h + str.charCodeAt(i);
-                h |= 0;
-            }
-            return h.toString();
-        }
-
         function handleLogin() {
             const typed = document.getElementById('adminPass').value;
-            if (simpleHash(typed) === CONFIG.ADMIN_PASSWORD_HASH) {
+            
+            // Check password directly
+            if (typed === CONFIG.ADMIN_PASSWORD) {
                 document.getElementById('loginOverlay').style.display = 'none';
                 document.getElementById('adminUI').style.display = 'block';
                 loadOrders();
             } else {
                 document.getElementById('errMsg').style.display = 'block';
+                document.getElementById('adminPass').value = ""; // Clear for retry
             }
         }
 
@@ -121,6 +114,7 @@
             
             if (error) {
                 console.error("Database error:", error);
+                alert("Failed to fetch orders. Check Supabase connection.");
                 return;
             }
 
@@ -129,11 +123,11 @@
             document.getElementById('orderCount').innerText = `${orders.length} orders found in database`;
 
             orders.forEach(order => {
-                // FALLBACK for missing data
+                // FALLBACK for missing data to prevent script errors
                 const cName = order.customer_name || "Guest";
                 const safeName = String(cName).replace(/\s+/g,'_');
 
-                // Get URLs from Supabase Storage
+                // Get Public URLs for images from Storage
                 const fUrl = sb.storage.from('order-photos').getPublicUrl(order.front_photo_path).data.publicUrl;
                 const bUrl = sb.storage.from('order-photos').getPublicUrl(order.back_photo_path).data.publicUrl;
 
@@ -146,7 +140,7 @@
                                 <span class="cust-email">${order.customer_email} | ${order.phone || 'No Phone'}</span>
                             </div>
                         </td>
-                        <td><span class="price-chip">${order.total_price_aed} AED</span></td>
+                        <td><span class="price-chip">${order.total_price_aed || '4.00'} AED</span></td>
                         <td>
                             <div class="btn-group">
                                 <a href="${fUrl}" download="${safeName}_Front" target="_blank" class="download-btn">
