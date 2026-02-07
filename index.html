@@ -3,358 +3,263 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KeyCraft | Premium Custom Keychains</title>
+    <title>KeyCraft | Custom Memories</title>
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --primary: #3498db;
-            --primary-dark: #2980b9;
-            --accent: #f39c12;
-            --dark: #2c3e50;
-            --light: #f8f9fa;
-            --success: #27ae60;
+            --primary: #6366f1;
+            --secondary: #a855f7;
+            --dark: #0f172a;
+            --glass: rgba(255, 255, 255, 0.8);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { background-color: #fff; color: var(--dark); overflow-x: hidden; scroll-behavior: smooth; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background: #f8fafc; color: var(--dark); overflow-x: hidden; scroll-behavior: smooth; }
 
         /* --- ANIMATIONS --- */
-        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s ease-out; }
+        .reveal { opacity: 0; transform: translateY(50px); transition: all 1s cubic-bezier(0.22, 1, 0.36, 1); }
         .reveal.active { opacity: 1; transform: translateY(0); }
 
-        /* --- NAVIGATION --- */
+        /* --- UI ELEMENTS --- */
         nav {
-            position: fixed; top: 0; width: 100%; padding: 1.5rem 0;
-            background: rgba(255,255,255,0.9); backdrop-filter: blur(10px);
-            z-index: 1000; box-shadow: 0 2px 20px rgba(0,0,0,0.05);
+            position: fixed; top: 0; width: 100%; padding: 1.2rem 0;
+            background: rgba(255,255,255,0.7); backdrop-filter: blur(15px);
+            z-index: 1000; border-bottom: 1px solid rgba(0,0,0,0.05);
         }
-        .nav-content { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 0 2rem; }
-        .logo { font-weight: 800; font-size: 1.5rem; letter-spacing: -1px; color: var(--dark); }
+        .nav-content { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; padding: 0 2rem; }
 
-        /* --- HERO SECTION --- */
         .hero {
-            height: 100vh; display: flex; align-items: center;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white; padding-top: 80px;
+            min-height: 100vh; display: flex; align-items: center;
+            background: radial-gradient(circle at top right, #e0e7ff, #f8fafc);
+            padding: 100px 2rem;
         }
-        .hero-grid {
-            max-width: 1200px; margin: 0 auto; display: grid; 
-            grid-template-columns: 1fr 1fr; gap: 4rem; padding: 0 2rem;
-        }
-        .hero-text h1 { font-size: clamp(3rem, 6vw, 5rem); line-height: 1; margin-bottom: 1.5rem; }
-        .price-tag { font-size: 5rem; font-weight: 900; color: var(--accent); margin-bottom: 1rem; }
-        .price-tag span { font-size: 1.5rem; margin-left: 0.5rem; }
-        .cta-btn {
-            display: inline-block; padding: 1.2rem 2.5rem; background: white;
-            color: var(--dark); text-decoration: none; border-radius: 50px;
-            font-weight: 700; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            transition: 0.3s;
-        }
-        .cta-btn:hover { transform: translateY(-3px); box-shadow: 0 15px 35px rgba(0,0,0,0.3); }
+        .hero-text h1 { font-size: clamp(3.5rem, 8vw, 6rem); font-weight: 800; line-height: 0.9; letter-spacing: -3px; margin-bottom: 2rem; background: linear-gradient(to right, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
-        /* --- ORDER FORM --- */
-        .order-section { padding: 100px 0; background: var(--light); }
-        .form-container {
-            max-width: 900px; margin: 0 auto; background: white;
-            padding: 3rem; border-radius: 30px; box-shadow: 0 20px 50px rgba(0,0,0,0.05);
-        }
-        .section-title { text-align: center; margin-bottom: 3rem; font-size: 2.5rem; }
+        /* --- PRODUCT SHOWCASE --- */
+        .details-section { padding: 100px 2rem; max-width: 1200px; margin: 0 auto; }
+        .details-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
+        .feature-card { padding: 2rem; background: white; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid #f1f5f9; margin-bottom: 1.5rem; }
 
-        .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
-        .input-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; font-size: 0.9rem; }
+        /* --- FORM STYLING --- */
+        .order-box {
+            background: white; padding: 4rem; border-radius: 40px; 
+            box-shadow: 0 40px 100px rgba(0,0,0,0.05); border: 1px solid #f1f5f9;
+        }
+        .input-group { margin-bottom: 1.5rem; }
+        .input-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: #64748b; }
         .input-group input {
-            width: 100%; padding: 1rem; border: 2px solid #eee;
-            border-radius: 12px; font-size: 1rem; outline: none; transition: 0.3s;
+            width: 100%; background: #f1f5f9; border: 2px solid transparent; border-radius: 16px;
+            padding: 1.2rem; transition: 0.3s;
         }
-        .input-group input:focus { border-color: var(--primary); }
+        .input-group input:focus { border-color: var(--primary); background: white; outline: none; }
 
-        /* Quantity Selector */
-        .qty-control { display: flex; align-items: center; justify-content: center; gap: 1rem; margin: 2rem 0; }
-        .qty-btn {
-            width: 50px; height: 50px; border-radius: 15px; border: none;
-            background: #eee; font-size: 1.5rem; cursor: pointer; transition: 0.2s;
-        }
-        .qty-btn:hover { background: var(--primary); color: white; }
-        #qty-val { font-size: 2rem; font-weight: 800; width: 60px; text-align: center; }
-
-        /* Photo Uploads */
-        .upload-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin: 2.5rem 0; }
         .upload-box {
-            height: 250px; border: 3px dashed #ddd; border-radius: 20px;
-            position: relative; display: flex; flex-direction: column;
-            align-items: center; justify-content: center; cursor: pointer;
-            overflow: hidden; background: #fafafa;
+            border: 2px dashed #cbd5e1; border-radius: 24px; transition: 0.3s;
+            background: #f8fafc; height: 200px; cursor: pointer;
+            position: relative; overflow: hidden; display: flex;
+            flex-direction: column; align-items: center; justify-content: center;
         }
+        .upload-box:hover { border-color: var(--primary); background: #eef2ff; }
         .upload-box img { position: absolute; width: 100%; height: 100%; object-fit: cover; display: none; }
-        .upload-box.active img { display: block; }
-
-        /* Pricing Summary */
-        .summary { background: #fdfdfd; padding: 2rem; border-radius: 20px; border: 1px solid #eee; }
-        .summary-line { display: flex; justify-content: space-between; margin-bottom: 1rem; }
-        .total-line { border-top: 2px solid #eee; padding-top: 1rem; font-weight: 800; font-size: 1.5rem; color: var(--primary); }
 
         .submit-btn {
-            width: 100%; padding: 1.5rem; background: var(--primary);
-            color: white; border: none; border-radius: 15px; font-size: 1.2rem;
-            font-weight: 700; cursor: pointer; margin-top: 2rem; transition: 0.3s;
+            background: var(--dark); color: white; border-radius: 20px;
+            padding: 1.5rem; font-weight: 800; font-size: 1.1rem; cursor: pointer;
+            width: 100%; transition: 0.4s; border: none;
         }
-        .submit-btn:disabled { background: #ccc; cursor: not-allowed; }
+        .submit-btn:hover { transform: scale(1.02); box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
 
-        /* --- MODAL --- */
-        .modal {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.8);
-            display: none; align-items: center; justify-content: center; z-index: 2000;
-        }
-        .modal-content {
-            background: white; padding: 3rem; border-radius: 30px;
-            max-width: 600px; width: 90%; text-align: center;
-        }
+        .price-badge { font-size: 4rem; font-weight: 800; color: var(--dark); }
+        .price-badge span { font-size: 1.5rem; color: #64748b; }
 
-        @media (max-width: 768px) {
-            .hero-grid, .input-grid, .upload-grid { grid-template-columns: 1fr; }
-            .hero { text-align: center; height: auto; padding: 120px 0 60px; }
-        }
+        footer { padding: 4rem; text-align: center; color: #64748b; }
     </style>
 </head>
 <body>
 
     <nav>
         <div class="nav-content">
-            <div class="logo">KEYCRAFT</div>
-            <div><a href="#order" class="cta-btn" style="padding: 0.6rem 1.5rem; font-size: 0.9rem;">Order Now</a></div>
+            <div style="font-weight: 900; font-size: 1.5rem;">KEYCRAFT</div>
+            <a href="#order" style="text-decoration: none; color: var(--primary); font-weight: 700;">Order Now</a>
         </div>
     </nav>
 
     <section class="hero">
-        <div class="hero-grid">
-            <div class="hero-text reveal">
-                <h1>Memories on your keys.</h1>
-                <div class="price-tag">4<span>AED</span></div>
-                <p>Custom double-sided photo keychains. High quality, water-resistant, and delivered in 24 hours.</p>
-                <br>
-                <a href="#order" class="cta-btn">Start Customizing</a>
+        <div style="max-width: 1200px; margin: 0 auto;">
+            <div class="reveal">
+                <p style="font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 2px;">Premium Craftsmanship</p>
+                <h1>Carry Your <br>Vibe Anywhere.</h1>
+                <div class="price-badge">4<span>AED</span></div>
+                <p style="max-width: 500px; font-size: 1.2rem; color: #64748b; margin: 2rem 0;">High-definition photos encased in durable, crystal-clear acrylic. The perfect gift for you or your bestie.</p>
+                <a href="#order" class="submit-btn" style="text-decoration: none; padding: 1.2rem 3rem; display: inline-block; width: auto;">Get Yours Today</a>
             </div>
         </div>
     </section>
 
-    <section id="order" class="order-section">
-        <div class="form-container reveal">
-            <h2 class="section-title">Order Your Keychain</h2>
+    <section class="details-section">
+        <div class="details-grid">
+            <div class="reveal">
+                <h2 style="font-size: 3rem; margin-bottom: 2rem;">Why KeyCraft?</h2>
+                <div class="feature-card">
+                    <h3>💎 Crystal Clarity</h3>
+                    <p>We use premium photo paper and UV-resistant acrylic to ensure your memories never fade.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>⚡ 24-Hour Turnaround</h3>
+                    <p>Orders placed today are ready for collection tomorrow. Speed is our promise.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>🔄 Double Sided</h3>
+                    <p>One photo is never enough. Every KeyCraft comes with two sides—at no extra cost.</p>
+                </div>
+            </div>
+            <div class="reveal" style="text-align: center;">
+                <div style="font-size: 10rem;">🔑</div>
+                <p style="font-weight: 800; color: var(--primary);">Handcrafted in Sharjah</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="order" style="padding: 100px 1rem; max-width: 1000px; margin: 0 auto;">
+        <div class="order-box reveal">
+            <h2 style="text-align: center; font-size: 3rem; margin-bottom: 3rem;">Customize Yours</h2>
             
-            <form id="keychainForm">
-                <div class="input-grid">
+            <form id="proForm">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem;">
                     <div class="input-group">
-                        <label>Full Name</label>
-                        <input type="text" id="custName" placeholder="Your name" required>
-                    </div>
-                    <div class="input-group">
-                        <label>Email Address</label>
-                        <input type="email" id="custEmail" placeholder="your@email.com" required>
-                    </div>
-                </div>
-
-                <div class="input-grid">
-                    <div class="input-group">
-                        <label>Phone Number</label>
-                        <input type="tel" id="custPhone" placeholder="050 000 0000">
+                        <label>Name</label>
+                        <input type="text" id="pName" placeholder="Full Name" required>
                     </div>
                     <div class="input-group">
-                        <label>Promo Code</label>
-                        <input type="text" id="promoCode" placeholder="Enter code here">
+                        <label>Email</label>
+                        <input type="email" id="pEmail" placeholder="email@example.com" required>
                     </div>
                 </div>
 
-                <div class="qty-control">
-                    <button type="button" class="qty-btn" onclick="changeQty(-1)">-</button>
-                    <div id="qty-val">1</div>
-                    <button type="button" class="qty-btn" onclick="changeQty(1)">+</button>
-                </div>
-
-                <div class="upload-grid">
-                    <div class="upload-box" id="box-front" onclick="document.getElementById('file-front').click()">
-                        <input type="file" id="file-front" hidden accept="image/*">
-                        <span>📸 Upload Front Side</span>
-                        <img id="prev-front">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 1rem;">
+                    <div class="upload-box" onclick="document.getElementById('fIn').click()">
+                        <input type="file" id="fIn" hidden accept="image/*" required>
+                        <span id="fLabel">📸 Front Side</span>
+                        <img id="fPrev">
                     </div>
-                    <div class="upload-box" id="box-back" onclick="document.getElementById('file-back').click()">
-                        <input type="file" id="file-back" hidden accept="image/*">
-                        <span>📸 Upload Back Side</span>
-                        <img id="prev-back">
+                    <div class="upload-box" onclick="document.getElementById('bIn').click()">
+                        <input type="file" id="bIn" hidden accept="image/*" required>
+                        <span id="bLabel">📸 Back Side</span>
+                        <img id="bPrev">
                     </div>
                 </div>
 
-                <div class="summary">
-                    <div class="summary-line">
-                        <span>Subtotal (<span id="summary-qty">1</span> units)</span>
-                        <span id="summary-sub">4.00 AED</span>
+                <div style="margin-top: 3rem; border-top: 1px solid #eee; padding-top: 2rem;">
+                    <div style="display: flex; justify-content: space-between; font-weight: 800; font-size: 1.5rem;">
+                        <span>Final Total</span>
+                        <span style="color: var(--primary);">4.00 AED</span>
                     </div>
-                    <div class="summary-line" id="discount-row" style="display:none; color: var(--success);">
-                        <span>Promo Discount</span>
-                        <span id="summary-disc">-0.00 AED</span>
-                    </div>
-                    <div class="summary-line total-line">
-                        <span>Total Price</span>
-                        <span id="summary-total">4.00 AED</span>
-                    </div>
+                    <p style="color: #64748b; font-size: 0.9rem; margin: 1rem 0;">* Payment is collected upon delivery/pickup.</p>
+                    <button type="submit" class="submit-btn" id="sBtn">Confirm Order</button>
                 </div>
-
-                <button type="submit" class="submit-btn" id="orderBtn">Place Order</button>
             </form>
         </div>
     </section>
 
-    <div class="modal" id="successModal">
-        <div class="modal-content">
-            <h2 style="color: var(--success); margin-bottom: 1rem;">Order Successful!</h2>
-            <p>Your order <strong id="orderNum">#</strong> has been received.</p>
-            <p>A confirmation email has been sent to you.</p>
-            <br>
-            <button class="cta-btn" style="background: var(--dark); color: white; border: none; cursor: pointer;" onclick="location.reload()">Done</button>
-        </div>
-    </div>
+    <footer>
+        <p>© 2026 KeyCraft Studios. All rights reserved.</p>
+    </footer>
 
     <script>
-        // --- 1. GLOBAL STATE & CONFIG ---
-        let supabaseClient;
-        let activePromos = [];
-        let quantity = 1;
-        let files = { front: null, back: null };
-
-        const CONFIG = {
-            SB_URL: "https://pkzvftleoysldqmjdgds.supabase.co",
-            SB_KEY: "sb_publishable_H9QIgdBqQZtHXcywZyDsjA_s4fXffjN",
-            EJS_KEY: "wFE7Ll5cDKSxM4Zfs",
-            EJS_SVC: "service_zlh57wd",
-            EJS_TMP: "template_hu5h00o"
+        let sb;
+        const cfg = {
+            url: "https://pkzvftleoysldqmjdgds.supabase.co",
+            key: "sb_publishable_H9QIgdBqQZtHXcywZyDsjA_s4fXffjN",
+            ejs_key: "wFE7Ll5cDKSxM4Zfs",
+            ejs_svc: "service_zlh57wd",
+            ejs_tmp: "template_hu5h00o"
         };
 
-        // --- 2. INITIALIZATION ---
-        window.onload = async () => {
-            emailjs.init(CONFIG.EJS_KEY);
-            supabaseClient = window.supabase.createClient(CONFIG.SB_URL, CONFIG.SB_KEY);
-            
-            // Load promo codes
-            const { data } = await supabaseClient.from('promo_codes').select('*').eq('active', true);
-            if (data) activePromos = data;
+        window.onload = () => {
+            emailjs.init(cfg.ejs_key);
+            sb = window.supabase.createClient(cfg.url, cfg.key);
 
-            // Trigger animations
-            window.addEventListener('scroll', revealOnScroll);
-            revealOnScroll(); 
+            // Scroll Animation Logic
+            const obs = new IntersectionObserver(entries => {
+                entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('active'); });
+            }, { threshold: 0.1 });
+            document.querySelectorAll('.reveal').forEach(r => obs.observe(r));
         };
 
-        // --- 3. UI FUNCTIONS ---
-        function revealOnScroll() {
-            document.querySelectorAll('.reveal').forEach(el => {
-                if (el.getBoundingClientRect().top < window.innerHeight - 100) el.classList.add('active');
-            });
-        }
-
-        function changeQty(amt) {
-            quantity = Math.max(1, Math.min(20, quantity + amt));
-            document.getElementById('qty-val').innerText = quantity;
-            document.getElementById('summary-qty').innerText = quantity;
-            calculatePrice();
-        }
-
-        document.getElementById('promoCode').addEventListener('input', calculatePrice);
-
-        function calculatePrice() {
-            let sub = quantity * 4;
-            let disc = 0;
-            const code = document.getElementById('promoCode').value.trim().toUpperCase();
-            const promo = activePromos.find(p => p.code === code);
-
-            if (promo) {
-                disc = promo.discount_type === 'percent' ? (sub * (promo.discount_value / 100)) : promo.discount_value;
-                document.getElementById('discount-row').style.display = 'flex';
-                document.getElementById('summary-disc').innerText = `-${disc.toFixed(2)} AED`;
-            } else {
-                document.getElementById('discount-row').style.display = 'none';
-            }
-
-            document.getElementById('summary-sub').innerText = sub.toFixed(2) + " AED";
-            document.getElementById('summary-total').innerText = (sub - disc).toFixed(2) + " AED";
-            return { sub, disc, total: sub - disc, code };
-        }
-
-        // Photo Handling
-        ['front', 'back'].forEach(side => {
-            document.getElementById(`file-${side}`).onchange = (e) => {
-                const file = e.target.files[0];
-                if (file) {
-                    files[side] = file;
-                    document.getElementById(`prev-${side}`).src = URL.createObjectURL(file);
-                    document.getElementById(`box-${side}`).classList.add('active');
+        // File Previews
+        ['f', 'b'].forEach(x => {
+            document.getElementById(`${x}In`).onchange = (e) => {
+                const f = e.target.files[0];
+                if(f) {
+                    const img = document.getElementById(`${x}Prev`);
+                    img.src = URL.createObjectURL(f);
+                    img.style.display = 'block';
+                    document.getElementById(`${x}Label`).style.display = 'none';
                 }
-            };
+            }
         });
 
-        // --- 4. SUBMISSION ---
-        document.getElementById('keychainForm').onsubmit = async (e) => {
+        document.getElementById('proForm').onsubmit = async (e) => {
             e.preventDefault();
-            const btn = document.getElementById('orderBtn');
-            
-            if (!files.front || !files.back) return alert("Please upload both photos!");
+            const btn = document.getElementById('sBtn');
+            const rawName = document.getElementById('pName').value;
+            const safeName = rawName.replace(/\s+/g, '_').toLowerCase(); // customer_name
             
             btn.disabled = true;
-            btn.innerText = "Processing Order...";
+            btn.innerText = "Saving your order...";
 
             try {
-                const pricing = calculatePrice();
-                const timestamp = Date.now();
-                
-                // 1. Upload to Storage
-                const pathF = `public/f_${timestamp}.jpg`;
-                const pathB = `public/b_${timestamp}.jpg`;
-                
-                await supabaseClient.storage.from('order-photos').upload(pathF, files.front);
-                await supabaseClient.storage.from('order-photos').upload(pathB, files.back);
-
-                const urlF = supabaseClient.storage.from('order-photos').getPublicUrl(pathF).data.publicUrl;
-                const urlB = supabaseClient.storage.from('order-photos').getPublicUrl(pathB).data.publicUrl;
-
-                // 2. Save to Database
-                const { data: order, error } = await supabaseClient.from('orders').insert([{
-                    customer_name: document.getElementById('custName').value,
-                    customer_email: document.getElementById('custEmail').value,
-                    phone: document.getElementById('custPhone').value,
-                    items: { qty: quantity, price_each: 4 },
-                    promo_code: pricing.code,
-                    discount_amount: pricing.disc,
-                    total_price_aed: pricing.total,
-                    front_photo_path: pathF,
-                    back_photo_path: pathB
+                // 1. Initial Database Entry
+                const { data: order, error: dbErr } = await sb.from('orders').insert([{
+                    customer_name: rawName,
+                    customer_email: document.getElementById('pEmail').value,
+                    total_price_aed: 4
                 }]).select().single();
 
-                if (error) throw error;
+                if(dbErr) throw dbErr;
 
-                // 3. Send EmailJS
-                await emailjs.send(CONFIG.EJS_SVC, CONFIG.EJS_TMP, {
+                // 2. Renaming and Uploading
+                const fFile = document.getElementById('fIn').files[0];
+                const bFile = document.getElementById('bIn').files[0];
+                
+                // Format: customername_orderID_side.jpg
+                const fName = `${safeName}_${order.id}_front.jpg`;
+                const bName = `${safeName}_${order.id}_back.jpg`;
+
+                await sb.storage.from('order-photos').upload(fName, fFile);
+                await sb.storage.from('order-photos').upload(bName, bFile);
+
+                const fUrl = sb.storage.from('order-photos').getPublicUrl(fName).data.publicUrl;
+                const bUrl = sb.storage.from('order-photos').getPublicUrl(bName).data.publicUrl;
+
+                // 3. Update Database with the specific file names
+                await sb.from('orders').update({ front_photo_path: fName, back_photo_path: bName }).eq('id', order.id);
+
+                // 4. Send Notification
+                await emailjs.send(cfg.ejs_svc, cfg.ejs_tmp, {
+                    cust_name: rawName,
+                    cust_email: document.getElementById('pEmail').value,
                     order_id: order.id,
-                    cust_name: order.customer_name,
-                    cust_email: order.customer_email,
-                    total: pricing.total.toFixed(2),
-                    front_url: urlF,
-                    back_url: urlB
+                    front_url: fUrl,
+                    back_url: bUrl
                 });
 
-                // 4. Show Success
-                document.getElementById('orderNum').innerText = `#${order.id}`;
-                document.getElementById('successModal').style.display = 'flex';
+                alert("Order Placed! Check your email for confirmation.");
+                location.reload();
 
             } catch (err) {
                 console.error(err);
-                alert("Order failed. Please check your connection.");
+                alert("Upload failed. Please check your internet.");
                 btn.disabled = false;
-                btn.innerText = "Place Order";
+                btn.innerText = "Confirm Order";
             }
-        };
+        }
     </script>
 </body>
 </html>
