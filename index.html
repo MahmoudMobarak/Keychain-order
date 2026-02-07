@@ -151,11 +151,6 @@
                     </div>
                 </div>
 
-                <div class="input-group">
-                    <label>Promo Code</label>
-                    <input type="text" id="promoCode" placeholder="Enter Code">
-                </div>
-
                 <div class="qty-wrapper">
                     <button type="button" class="qty-btn" onclick="updateQty(-1)">−</button>
                     <div id="qtyText">1</div>
@@ -174,7 +169,13 @@
                         <img id="bImg">
                     </div>
                 </div>
-
+                <div class="input-group" style="margin-top: 2rem;">
+                    <label>Promo Code</label>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" id="promoInput" placeholder="Enter code (e.g. SCHOOL)" style="text-transform: uppercase;">
+                        <button type="button" onclick="applyPromo()" id="promoBtn" style="padding: 0 20px; border-radius: 15px; background: var(--primary); color: white; border: none; font-weight: 700; cursor: pointer;">Apply</button>
+                    </div>
+                </div>
                 <div style="padding: 3rem; background: #f8fafc; border-radius: 35px; margin-bottom: 3rem; text-align: center;">
                     <div style="font-weight: 800; font-size: 2.5rem;">
                         <span style="color: #64748b; font-size: 1.2rem; display: block; margin-bottom: 0.5rem; text-transform: uppercase;">Final Price</span>
@@ -226,12 +227,56 @@
             document.querySelectorAll('.reveal').forEach(r => obs.observe(r));
         };
 
+        let activePromo = null;
+        let discountInfo = { type: null, value: 0 };
+        
+        async function applyPromo() {
+            const codeInput = document.getElementById('promoInput').value.trim().toUpperCase();
+            if(!codeInput) return;
+        
+            const { data: promo, error } = await sb
+                .from('promo_codes')
+                .select('*')
+                .eq('code', codeInput)
+                .eq('active', true)
+                .single();
+        
+            if (error || !promo) {
+                alert("Invalid code");
+                activePromo = null;
+                discountInfo = { type: null, value: 0 };
+            } else {
+                activePromo = promo.code;
+                discountInfo = { type: promo.discount_type, value: parseFloat(promo.discount_value) };
+                document.getElementById('promoBtn').style.background = "#10b981";
+                document.getElementById('promoBtn').innerText = "Applied!";
+            }
+            updateQty(0); 
+        }
+        
         function updateQty(n) {
             qty = Math.max(1, Math.min(10, qty + n));
             document.getElementById('qtyText').innerText = qty;
-            document.getElementById('totalDisplay').innerText = (qty * 4).toFixed(2) + " AED";
+            
+            let subtotal = qty * 4;
+            let discountAmount = 0;
+        
+            if (activePromo) {
+                // Logic for 'percent' vs 'money' from your DB
+                if (discountInfo.type === 'percent') {
+                    discountAmount = subtotal * (discountInfo.value / 100);
+                } else {
+                    discountAmount = discountInfo.value; // 'money' type
+                }
+            }
+        
+            const finalTotal = Math.max(0, subtotal - discountAmount);
+            document.getElementById('totalDisplay').innerText = finalTotal.toFixed(2) + " AED";
+            
+            // Store for the submit function
+            window.currentDiscount = discountAmount;
+            window.currentTotal = finalTotal;
         }
-
         ['f', 'b'].forEach(x => {
             document.getElementById(`${x}File`).onchange = (e) => {
                 const file = e.target.files[0];
@@ -258,12 +303,14 @@
             btn.innerText = "Processing...";
 
             try {
+                    // Inside your sb.from('orders').insert([...])
                 const { data: order, error } = await sb.from('orders').insert([{
                     customer_name: rawName,
                     customer_email: document.getElementById('custEmail').value,
                     phone: document.getElementById('custPhone').value,
-                    promo_code: document.getElementById('promoCode').value,
-                    total_price_aed: totalPrice
+                    promo_code: activePromo,
+                    discount_amount: window.currentDiscount || 0,
+                    total_price_aed: window.currentTotal || (qty * 4)
                 }]).select().single();
 
                 if(error) throw error;
