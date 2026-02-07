@@ -3,81 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KeyCraft | Admin Order Manager</title>
+    <title>KeyCraft | Admin Manager</title>
     
+    <script src="admin-config.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     
     <style>
-        :root { --primary: #6366f1; --dark: #0f172a; --bg: #f1f5f9; }
+        :root { --primary: #6366f1; --dark: #0f172a; --bg: #f1f5f9; --success: #10b981; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
         body { background: var(--bg); color: var(--dark); padding: 40px; }
 
-        /* Login Overlay */
-        #loginOverlay {
-            position: fixed; inset: 0; background: var(--dark);
-            display: flex; align-items: center; justify-content: center; z-index: 2000;
-        }
-        .login-card { background: white; padding: 3rem; border-radius: 35px; width: 100%; max-width: 400px; text-align: center; }
-        input { width: 100%; padding: 1.2rem; margin-bottom: 1.2rem; border-radius: 15px; border: 2px solid #e2e8f0; font-size: 1.1rem; }
-        .unlock-btn { width: 100%; padding: 1.2rem; background: var(--primary); color: white; border: none; border-radius: 15px; font-weight: 800; cursor: pointer; }
-
-        /* Dashboard Layout */
+        #loginOverlay { position: fixed; inset: 0; background: var(--dark); display: flex; align-items: center; justify-content: center; z-index: 2000; }
+        .login-card { background: white; padding: 3rem; border-radius: 35px; width: 400px; text-align: center; }
+        input[type="password"] { width: 100%; padding: 1.2rem; margin-bottom: 1.2rem; border-radius: 15px; border: 2px solid #e2e8f0; font-size: 1.1rem; }
+        
+        .main-container { display: none; }
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-        .main-container { display: none; } 
 
-        /* Table Design */
-        .table-wrapper { background: white; border-radius: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.05); overflow: hidden; }
-        table { width: 100%; border-collapse: collapse; }
-        th { background: #f8fafc; padding: 20px; text-align: left; font-size: 0.85rem; color: #64748b; border-bottom: 2px solid #edf2f7; text-transform: uppercase; letter-spacing: 1px; }
+        .table-wrapper { background: white; border-radius: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.05); overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 1000px; }
+        th { background: #f8fafc; padding: 20px; text-align: left; font-size: 0.8rem; color: #64748b; text-transform: uppercase; border-bottom: 2px solid #edf2f7; }
         td { padding: 20px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
-        
-        .cust-info { display: flex; flex-direction: column; }
-        .cust-name { font-weight: 800; font-size: 1.1rem; }
-        .cust-email { color: #64748b; font-size: 0.9rem; }
 
-        /* Download Buttons */
-        .btn-group { display: flex; gap: 10px; }
-        .download-btn {
-            display: inline-flex; align-items: center; gap: 8px;
-            padding: 10px 18px; background: #eef2ff; color: var(--primary);
-            text-decoration: none; border-radius: 12px; font-weight: 700;
-            font-size: 0.85rem; border: 1px solid #e0e7ff; transition: 0.2s;
-        }
-        .download-btn:hover { background: var(--primary); color: white; transform: translateY(-2px); }
+        .promo-tag { background: #e0e7ff; color: #4338ca; padding: 4px 10px; border-radius: 6px; font-weight: 700; font-size: 0.8rem; }
+        .download-btn { padding: 8px 14px; background: #f1f5f9; color: var(--primary); text-decoration: none; border-radius: 10px; font-weight: 700; font-size: 0.8rem; border: 1px solid #e2e8f0; }
         
-        .price-chip { font-weight: 800; color: #059669; background: #ecfdf5; padding: 6px 12px; border-radius: 8px; }
+        /* Completed Row Style */
+        tr.completed-row { opacity: 0.6; background: #f8fafc; }
+        .status-btn { background: var(--success); color: white; border: none; padding: 10px 15px; border-radius: 10px; cursor: pointer; font-weight: 700; }
     </style>
 </head>
 <body>
 
     <div id="loginOverlay">
         <div class="login-card">
-            <h2 style="margin-bottom: 1.5rem; letter-spacing: -1px;">Admin Access</h2>
+            <h2>Admin Access</h2>
             <input type="password" id="adminPass" placeholder="Enter Password">
-            <button class="unlock-btn" onclick="handleLogin()">Unlock Orders</button>
-            <p id="errMsg" style="color: #ef4444; margin-top: 1rem; display: none; font-weight: 600;">Access Denied</p>
+            <button onclick="handleLogin()" style="width:100%; padding:1rem; background:var(--primary); color:white; border:none; border-radius:15px; font-weight:800; cursor:pointer;">Unlock</button>
         </div>
     </div>
 
     <div class="main-container" id="adminUI">
         <div class="header">
-            <div>
-                <h1 style="font-size: 2.5rem; letter-spacing: -1.5px;">Active Orders</h1>
-                <p id="orderCount" style="color: #64748b; font-weight: 600;">Loading totals...</p>
-            </div>
-            <button onclick="location.reload()" style="background: white; border: 1px solid #cbd5e1; padding: 10px 20px; border-radius: 12px; cursor: pointer; font-weight: 700;">Lock Panel</button>
+            <h1>Order History</h1>
+            <button onclick="location.reload()" style="padding:10px 20px; border-radius:10px; border:1px solid #ccc; cursor:pointer;">Lock Panel</button>
         </div>
 
         <div class="table-wrapper">
             <table>
                 <thead>
                     <tr>
+                        <th>Status</th>
                         <th>ID</th>
-                        <th>Customer Details</th>
-                        <th>Price</th>
-                        <th>Photo Assets</th>
-                        <th>Order Date</th>
+                        <th>Customer</th>
+                        <th>Promo/Discount</th>
+                        <th>Final Price</th>
+                        <th>Photos</th>
+                        <th>Date</th>
                     </tr>
                 </thead>
                 <tbody id="orderTable"></tbody>
@@ -86,83 +69,71 @@
     </div>
 
     <script>
-        // CONFIGURATION
-        const CONFIG = {
-            SB_URL: "https://pkzvftleoysldqmjdgds.supabase.co",
-            SB_KEY: "sb_publishable_H9QIgdBqQZtHXcywZyDsjA_s4fXffjN",
-            ADMIN_PASSWORD: "KeyCraft2026" // DIRECT PASSWORD SYSTEM
-        };
-
         const sb = supabase.createClient(CONFIG.SB_URL, CONFIG.SB_KEY);
+
+        function simpleHash(str) {
+            let h = 0; for (let i = 0; i < str.length; i++) { h = (h << 5) - h + str.charCodeAt(i); h |= 0; }
+            return h.toString();
+        }
 
         function handleLogin() {
             const typed = document.getElementById('adminPass').value;
-            
-            // Check password directly
-            if (typed === CONFIG.ADMIN_PASSWORD) {
+            if (simpleHash(typed) === CONFIG.ADMIN_PASSWORD_HASH) {
                 document.getElementById('loginOverlay').style.display = 'none';
                 document.getElementById('adminUI').style.display = 'block';
                 loadOrders();
-            } else {
-                document.getElementById('errMsg').style.display = 'block';
-                document.getElementById('adminPass').value = ""; // Clear for retry
-            }
+            } else { alert("Incorrect Password"); }
         }
 
         async function loadOrders() {
             const { data: orders, error } = await sb.from('orders').select('*').order('created_at', { ascending: false });
-            
-            if (error) {
-                console.error("Database error:", error);
-                alert("Failed to fetch orders. Check Supabase connection.");
-                return;
-            }
+            if (error) return console.error(error);
 
             const table = document.getElementById('orderTable');
             table.innerHTML = "";
-            document.getElementById('orderCount').innerText = `${orders.length} orders found in database`;
 
             orders.forEach(order => {
-                // FALLBACK for missing data to prevent script errors
-                const cName = order.customer_name || "Guest";
-                const safeName = String(cName).replace(/\s+/g,'_');
-
-                // Get Public URLs for images from Storage
+                const isDone = order.is_completed; // Assumes you have 'is_completed' column (boolean)
                 const fUrl = sb.storage.from('order-photos').getPublicUrl(order.front_photo_path).data.publicUrl;
                 const bUrl = sb.storage.from('order-photos').getPublicUrl(order.back_photo_path).data.publicUrl;
 
                 table.innerHTML += `
-                    <tr>
-                        <td style="color: #94a3b8; font-weight: 600;">#${order.id}</td>
+                    <tr class="${isDone ? 'completed-row' : ''}">
                         <td>
-                            <div class="cust-info">
-                                <span class="cust-name">${cName}</span>
-                                <span class="cust-email">${order.customer_email} | ${order.phone || 'No Phone'}</span>
-                            </div>
+                            <input type="checkbox" ${isDone ? 'checked' : ''} 
+                                   onchange="toggleComplete(${order.id}, this.checked)" 
+                                   style="width:20px; height:20px; cursor:pointer;">
                         </td>
-                        <td><span class="price-chip">${order.total_price_aed || '4.00'} AED</span></td>
+                        <td style="font-size:0.8rem; color:#94a3b8;">#${order.id}</td>
                         <td>
-                            <div class="btn-group">
-                                <a href="${fUrl}" download="${safeName}_Front" target="_blank" class="download-btn">
-                                    💾 Front
-                                </a>
-                                <a href="${bUrl}" download="${safeName}_Back" target="_blank" class="download-btn">
-                                    💾 Back
-                                </a>
-                            </div>
+                            <strong>${order.customer_name}</strong><br>
+                            <span style="font-size:0.8rem; color:#64748b;">${order.phone}</span>
                         </td>
-                        <td style="color: #64748b; font-size: 0.9rem;">
-                            ${new Date(order.created_at).toLocaleDateString(undefined, {month: 'short', day: 'numeric', year: 'numeric'})}
+                        <td>
+                            ${order.promo_code ? `<span class="promo-tag">${order.promo_code}</span>` : '<span style="color:#cbd5e1">—</span>'}
                         </td>
+                        <td style="font-weight:800; color:#059669;">${order.total_price_aed} AED</td>
+                        <td>
+                            <a href="${fUrl}" target="_blank" class="download-btn">Front</a>
+                            <a href="${bUrl}" target="_blank" class="download-btn">Back</a>
+                        </td>
+                        <td style="font-size:0.8rem;">${new Date(order.created_at).toLocaleDateString()}</td>
                     </tr>
                 `;
             });
         }
 
-        // Allow "Enter" key to login
-        document.getElementById('adminPass').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') handleLogin();
-        });
+        async function toggleComplete(orderId, status) {
+            const { error } = await sb.from('orders')
+                .update({ is_completed: status })
+                .eq('id', orderId);
+            
+            if (error) {
+                alert("Error updating status");
+            } else {
+                loadOrders(); // Refresh list to show fade effect
+            }
+        }
     </script>
 </body>
 </html>
