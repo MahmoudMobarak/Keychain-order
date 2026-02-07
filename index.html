@@ -281,11 +281,13 @@
 
                 await sb.from('orders').update({ front_photo_path: fName, back_photo_path: bName }).eq('id', order.id);
 
+                // 3. Send Email
                 await emailjs.send(config.ejs_svc, config.ejs_tmp, {
                     cust_name: rawName,
                     cust_email: document.getElementById('custEmail').value,
                     order_id: order.id,
-                    total_price: totalPrice, 
+                    total_price: totalPrice,
+                    quantity: qty, // Match this to your {{quantity}} tag in EmailJS
                     front_url: fUrl,
                     back_url: bUrl
                 });
