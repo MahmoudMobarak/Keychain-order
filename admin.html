@@ -29,15 +29,33 @@
         th { background: #f8fafc; padding: 20px; text-align: left; font-size: 0.8rem; color: #64748b; text-transform: uppercase; border-bottom: 2px solid #edf2f7; }
         td { padding: 20px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
 
-        /* Actions */
-        .promo-tag { background: #fee2e2; color: #dc2626; padding: 4px 10px; border-radius: 6px; font-weight: 700; font-size: 0.8rem; }
-        .download-btn { padding: 8px 14px; background: #f1f5f9; color: var(--primary); text-decoration: none; border-radius: 10px; font-weight: 700; font-size: 0.8rem; border: 1px solid #e2e8f0; margin-right: 5px; }
-        
-        .delete-btn { 
-            padding: 8px 12px; background: #fef2f2; color: var(--danger); 
-            border: 1px solid #fee2e2; border-radius: 10px; cursor: pointer; 
-            font-weight: 700; font-size: 0.8rem; transition: 0.2s;
+        /* --- THE ANIMATED PHOTO BUTTONS --- */
+        .btn-container { display: flex; gap: 8px; }
+        .download-btn { 
+            padding: 10px 16px; 
+            background: white; 
+            color: var(--primary); 
+            text-decoration: none; 
+            border-radius: 12px; 
+            font-weight: 700; 
+            font-size: 0.85rem; 
+            border: 1px solid #e2e8f0; 
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            display: inline-block;
         }
+
+        /* Glow and Expand Animation on Hover */
+        .download-btn:hover { 
+            transform: scale(1.15) translateY(-3px); 
+            background: var(--primary); 
+            color: white; 
+            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.4); 
+            border-color: var(--primary);
+            z-index: 10;
+        }
+
+        .promo-tag { background: #fee2e2; color: #dc2626; padding: 4px 10px; border-radius: 6px; font-weight: 700; font-size: 0.8rem; }
+        .delete-btn { padding: 8px 12px; background: #fef2f2; color: var(--danger); border: 1px solid #fee2e2; border-radius: 10px; cursor: pointer; font-weight: 700; }
         .delete-btn:hover { background: var(--danger); color: white; }
 
         tr.completed-row { opacity: 0.4; filter: grayscale(1); background: #f8fafc; }
@@ -58,9 +76,9 @@
         <div class="header">
             <div>
                 <h1>KeyCraft Dashboard</h1>
-                <p id="stats" style="color: #64748b; font-weight: 600;">Connecting...</p>
+                <p id="stats" style="color: #64748b; font-weight: 600;">Loading all orders...</p>
             </div>
-            <button onclick="location.reload()" style="padding:10px 20px; border-radius:10px; border:1px solid #ccc; cursor:pointer; font-weight:700">Lock</button>
+            <button onclick="location.reload()" style="padding:10px 20px; border-radius:10px; border:1px solid #ccc; cursor:pointer; font-weight:700">Lock Panel</button>
         </div>
 
         <div class="table-wrapper">
@@ -72,7 +90,7 @@
                         <th>Customer</th>
                         <th>Promo</th>
                         <th>Price</th>
-                        <th>Photos</th>
+                        <th>Photo Assets</th>
                         <th>Date</th>
                         <th>Action</th>
                     </tr>
@@ -100,12 +118,20 @@
         }
 
         async function loadOrders() {
-            const { data: orders, error } = await sb.from('orders').select('*').order('created_at', { ascending: false });
-            if (error) return console.error(error);
+            // FIX: Removed any hidden limits and sorted by latest first
+            const { data: orders, error } = await sb
+                .from('orders')
+                .select('*')
+                .order('id', { ascending: false }); // Sorting by ID descending ensures you see ALL orders
+            
+            if (error) {
+                console.error("Fetch error:", error);
+                return;
+            }
 
             const table = document.getElementById('orderTable');
             table.innerHTML = "";
-            document.getElementById('stats').innerText = `${orders.length} total orders recorded`;
+            document.getElementById('stats').innerText = `${orders.length} total orders found in database`;
 
             orders.forEach(order => {
                 const isDone = order.is_completed; 
@@ -119,7 +145,7 @@
                                    ${isDone ? 'checked' : ''} 
                                    onchange="toggleStatus(${order.id}, this.checked)">
                         </td>
-                        <td style="font-family: monospace; color:#64748b;">#${order.id}</td>
+                        <td style="font-family: monospace; color:#64748b; font-weight:700;">#${order.id}</td>
                         <td>
                             <div style="font-weight:700">${order.customer_name}</div>
                             <div style="font-size:0.8rem; color:#64748b">${order.phone}</div>
@@ -127,8 +153,10 @@
                         <td>${order.promo_code ? `<span class="promo-tag">${order.promo_code}</span>` : '—'}</td>
                         <td style="font-weight:800; color:#059669;">${order.total_price_aed} AED</td>
                         <td>
-                            <a href="${fUrl}" target="_blank" class="download-btn">Front</a>
-                            <a href="${bUrl}" target="_blank" class="download-btn">Back</a>
+                            <div class="btn-container">
+                                <a href="${fUrl}" target="_blank" class="download-btn">Front</a>
+                                <a href="${bUrl}" target="_blank" class="download-btn">Back</a>
+                            </div>
                         </td>
                         <td style="font-size:0.8rem; color:#64748b">${new Date(order.created_at).toLocaleDateString()}</td>
                         <td>
@@ -140,19 +168,15 @@
         }
 
         async function toggleStatus(orderId, status) {
-            const { error } = await sb.from('orders').update({ is_completed: status }).eq('id', orderId);
-            if (error) alert("Update failed"); else loadOrders();
+            await sb.from('orders').update({ is_completed: status }).eq('id', orderId);
+            loadOrders();
         }
 
         async function deleteOrder(orderId) {
-            if (confirm("Are you sure? This will permanently delete this order from the database.")) {
+            if (confirm("Permanently delete order #" + orderId + "?")) {
                 const { error } = await sb.from('orders').delete().eq('id', orderId);
-                if (error) {
-                    alert("Delete failed. Check Supabase RLS policies.");
-                    console.error(error);
-                } else {
-                    loadOrders();
-                }
+                if (error) alert("Delete failed: " + error.message);
+                else loadOrders();
             }
         }
 
