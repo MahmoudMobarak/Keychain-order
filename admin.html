@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KeyCraft | Admin Order Manager</title>
     
-    <script src="admin-config.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     
@@ -25,7 +24,7 @@
 
         /* Dashboard Layout */
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-        .main-container { display: none; } /* Hidden until login */
+        .main-container { display: none; } 
 
         /* Table Design */
         .table-wrapper { background: white; border-radius: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.05); overflow: hidden; }
@@ -81,14 +80,30 @@
                         <th>Order Date</th>
                     </tr>
                 </thead>
-                <tbody id="orderTable">
-                    </tbody>
+                <tbody id="orderTable"></tbody>
             </table>
         </div>
     </div>
 
     <script>
+        // CONFIGURATION
+        const CONFIG = {
+            SB_URL: "https://pkzvftleoysldqmjdgds.supabase.co",
+            SB_KEY: "sb_publishable_H9QIgdBqQZtHXcywZyDsjA_s4fXffjN",
+            ADMIN_PASSWORD_HASH: "-2017042526" // Password is: KeyCraft2026
+        };
+
         const sb = supabase.createClient(CONFIG.SB_URL, CONFIG.SB_KEY);
+
+        // ESSENTIAL: Simple hashing function to match your password system
+        function simpleHash(str) {
+            let h = 0;
+            for (let i = 0; i < str.length; i++) {
+                h = (h << 5) - h + str.charCodeAt(i);
+                h |= 0;
+            }
+            return h.toString();
+        }
 
         function handleLogin() {
             const typed = document.getElementById('adminPass').value;
@@ -114,6 +129,10 @@
             document.getElementById('orderCount').innerText = `${orders.length} orders found in database`;
 
             orders.forEach(order => {
+                // FALLBACK for missing data
+                const cName = order.customer_name || "Guest";
+                const safeName = String(cName).replace(/\s+/g,'_');
+
                 // Get URLs from Supabase Storage
                 const fUrl = sb.storage.from('order-photos').getPublicUrl(order.front_photo_path).data.publicUrl;
                 const bUrl = sb.storage.from('order-photos').getPublicUrl(order.back_photo_path).data.publicUrl;
@@ -123,17 +142,17 @@
                         <td style="color: #94a3b8; font-weight: 600;">#${order.id}</td>
                         <td>
                             <div class="cust-info">
-                                <span class="cust-name">${order.customer_name}</span>
+                                <span class="cust-name">${cName}</span>
                                 <span class="cust-email">${order.customer_email} | ${order.phone || 'No Phone'}</span>
                             </div>
                         </td>
                         <td><span class="price-chip">${order.total_price_aed} AED</span></td>
                         <td>
                             <div class="btn-group">
-                                <a href="${fUrl}" download="${order.customer_name}_Front" target="_blank" class="download-btn">
+                                <a href="${fUrl}" download="${safeName}_Front" target="_blank" class="download-btn">
                                     💾 Front
                                 </a>
-                                <a href="${bUrl}" download="${order.customer_name}_Back" target="_blank" class="download-btn">
+                                <a href="${bUrl}" download="${safeName}_Back" target="_blank" class="download-btn">
                                     💾 Back
                                 </a>
                             </div>
@@ -145,6 +164,11 @@
                 `;
             });
         }
+
+        // Allow "Enter" key to login
+        document.getElementById('adminPass').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') handleLogin();
+        });
     </script>
 </body>
 </html>
