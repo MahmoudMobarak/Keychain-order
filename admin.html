@@ -3,145 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KeyCraft | Admin Dashboard</title>
+    <title>KeyCraft | Secure Admin</title>
+    
+    <script src="admin-config.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    
     <style>
         :root { --primary: #6366f1; --dark: #0f172a; --bg: #f8fafc; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
         body { background: var(--bg); color: var(--dark); padding: 2rem; }
 
-        /* Login Screen */
         #loginOverlay {
             position: fixed; inset: 0; background: var(--dark);
             display: flex; align-items: center; justify-content: center; z-index: 1000;
         }
         .login-card { background: white; padding: 3rem; border-radius: 30px; width: 100%; max-width: 400px; text-align: center; }
         input { width: 100%; padding: 1rem; margin-bottom: 1rem; border-radius: 12px; border: 2px solid #eee; font-size: 1rem; }
-        button { width: 100%; padding: 1rem; background: var(--primary); color: white; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; }
+        button { width: 100%; padding: 1.2rem; background: var(--primary); color: white; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; }
 
-        /* Dashboard */
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
-        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 3rem; }
-        .stat-card { background: white; padding: 1.5rem; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        .stat-card h3 { font-size: 0.8rem; color: #64748b; text-transform: uppercase; }
-        .stat-card p { font-size: 2rem; font-weight: 800; }
-
         table { width: 100%; border-collapse: collapse; background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
         th { background: #f1f5f9; padding: 1.2rem; text-align: left; font-size: 0.9rem; color: #64748b; }
-        td { padding: 1.2rem; border-bottom: 1px solid #f1f5f9; font-size: 0.95rem; }
-        .badge { padding: 0.4rem 0.8rem; border-radius: 8px; font-size: 0.8rem; font-weight: 700; background: #e0e7ff; color: var(--primary); }
-        .photo-link { color: var(--primary); text-decoration: none; font-weight: 600; }
-        .photo-link:hover { text-decoration: underline; }
+        td { padding: 1.2rem; border-bottom: 1px solid #f1f5f9; }
+        .photo-link { color: var(--primary); text-decoration: none; font-weight: 700; background: #eef2ff; padding: 5px 10px; border-radius: 8px; }
     </style>
 </head>
 <body>
 
     <div id="loginOverlay">
         <div class="login-card">
-            <h2 style="margin-bottom: 1.5rem;">Admin Login</h2>
-            <input type="email" id="email" placeholder="Admin Email">
-            <input type="password" id="pass" placeholder="Password">
-            <button onclick="handleLogin()">Sign In</button>
-            <p id="errMsg" style="color: red; margin-top: 1rem; display: none;">Invalid Login</p>
+            <h2 style="margin-bottom: 1.5rem;">Access Admin</h2>
+            <input type="password" id="adminPass" placeholder="Enter Admin Password">
+            <button onclick="handleLogin()">Unlock Dashboard</button>
+            <p id="errMsg" style="color: red; margin-top: 1rem; display: none;">Wrong Password</p>
         </div>
     </div>
 
     <div class="header">
         <h1>Order Dashboard</h1>
-        <button onclick="handleLogout()" style="width: auto; padding: 0.6rem 1.5rem; background: #ef4444;">Logout</button>
+        <button onclick="location.reload()" style="width: auto; padding: 0.6rem 1.5rem; background: #eee; color: #333; border: none; border-radius: 10px; cursor: pointer;">Lock Panel</button>
     </div>
 
-    <div class="stats">
-        <div class="stat-card"><h3>Total Orders</h3><p id="statTotal">0</p></div>
-        <div class="stat-card"><h3>Total Revenue</h3><p id="statRev">0 AED</p></div>
-    </div>
-
-    <table>
+    <table id="adminContent" style="display:none;">
         <thead>
             <tr>
                 <th>ID</th>
                 <th>Customer</th>
-                <th>Contact</th>
-                <th>Total</th>
-                <th>Photos (F/B)</th>
-                <th>Date</th>
+                <th>Price</th>
+                <th>Photos</th>
             </tr>
         </thead>
-        <tbody id="orderTable">
-            </tbody>
+        <tbody id="orderTable"></tbody>
     </table>
 
     <script>
-        const SB_URL = "https://pkzvftleoysldqmjdgds.supabase.co";
-        const SB_KEY = "sb_publishable_H9QIgdBqQZtHXcywZyDsjA_s4fXffjN";
-        const sb = supabase.createClient(SB_URL, SB_KEY);
+        const sb = supabase.createClient(CONFIG.SB_URL, CONFIG.SB_KEY);
 
-        async function handleLogin() {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('pass').value;
-            const { data, error } = await sb.auth.signInWithPassword({ email, password });
-
-            if (error) {
-                document.getElementById('errMsg').style.display = 'block';
-            } else {
+        function handleLogin() {
+            const typedPassword = document.getElementById('adminPass').value;
+            
+            // Compare the hash of what was typed to the hash in config
+            if (simpleHash(typedPassword) === CONFIG.ADMIN_PASSWORD_HASH) {
                 document.getElementById('loginOverlay').style.display = 'none';
+                document.getElementById('adminContent').style.display = 'table';
                 loadOrders();
+            } else {
+                document.getElementById('errMsg').style.display = 'block';
             }
         }
 
         async function loadOrders() {
-            const { data: orders, error } = await sb
-                .from('orders')
-                .select('*')
-                .order('created_at', { ascending: false });
-
+            const { data: orders, error } = await sb.from('orders').select('*').order('created_at', { ascending: false });
             if (error) return console.error(error);
 
             const table = document.getElementById('orderTable');
             table.innerHTML = "";
-            let totalRev = 0;
 
             orders.forEach(order => {
-                totalRev += parseFloat(order.total_price_aed || 0);
-                
-                // Construct photo URLs
                 const fUrl = sb.storage.from('order-photos').getPublicUrl(order.front_photo_path).data.publicUrl;
                 const bUrl = sb.storage.from('order-photos').getPublicUrl(order.back_photo_path).data.publicUrl;
 
-                const row = `
+                table.innerHTML += `
                     <tr>
                         <td>#${order.id}</td>
-                        <td><strong>${order.customer_name}</strong></td>
-                        <td>${order.customer_email}<br><small>${order.phone || 'No Phone'}</small></td>
-                        <td><span class="badge">${order.total_price_aed} AED</span></td>
+                        <td><strong>${order.customer_name}</strong><br><small>${order.customer_email}</small></td>
+                        <td style="color: #10b981; font-weight: 800;">${order.total_price_aed} AED</td>
                         <td>
-                            <a href="${fUrl}" target="_blank" class="photo-link">Front</a> / 
+                            <a href="${fUrl}" target="_blank" class="photo-link">Front</a>
                             <a href="${bUrl}" target="_blank" class="photo-link">Back</a>
                         </td>
-                        <td>${new Date(order.created_at).toLocaleDateString()}</td>
                     </tr>
                 `;
-                table.innerHTML += row;
             });
-
-            document.getElementById('statTotal').innerText = orders.length;
-            document.getElementById('statRev').innerText = totalRev.toFixed(2) + " AED";
         }
-
-        async function handleLogout() {
-            await sb.auth.signOut();
-            location.reload();
-        }
-
-        // Auto-check session on load
-        window.onload = async () => {
-            const { data } = await sb.auth.getSession();
-            if (data.session) {
-                document.getElementById('loginOverlay').style.display = 'none';
-                loadOrders();
-            }
-        };
     </script>
 </body>
 </html>
