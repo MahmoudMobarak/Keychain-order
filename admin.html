@@ -149,10 +149,12 @@
                         <td>
                             <div style="font-weight:700">${order.customer_name}</div>
                             <div style="font-size:0.8rem; color:#64748b">${order.phone}</div>
-                        </td>
-                        <td>${order.promo_code ? `<span class="promo-tag">${order.promo_code}</span>` : '—'}</td>
-                        <td style="font-weight:800; color:#059669;">${order.total_price_aed} AED</td>
                         <td>
+                            ${order.promo_code ? 
+                                `<span class="promo-tag">${order.promo_code}</span>
+                                 <div style="font-size:0.75rem; color:var(--danger); font-weight:700;">-${order.discount_amount} AED</div>` 
+                                : '<span style="color:#cbd5e1">—</span>'}
+                        </td>
                             <div class="btn-container">
                                 <a href="${fUrl}" target="_blank" class="download-btn">Front</a>
                                 <a href="${bUrl}" target="_blank" class="download-btn">Back</a>
