@@ -1,735 +1,366 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KeyCraft - Custom Keychains | 4 AED</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        /* SMOOTH ANIMATIONS */
-        * { 
-            margin: 0; padding: 0; box-sizing: border-box;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .animate, .animate-item {
-            opacity: 0; transform: translateY(40px);
-        }
-        .animate.show, .animate-item.show {
-            opacity: 1; transform: translateY(0);
-            transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        }
-        body.loaded .hero-section { opacity: 1; transform: translateY(0); }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KeyCraft – Custom Photo Keychains | 4 AED</title>
 
-        body {
-            font-family: 'Inter', sans-serif;
-            line-height: 1.6; color: #2c3e50;
-            overflow-x: hidden;
-        }
-        .container { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
+<!-- LIBRARIES -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.emailjs.com/dist/email.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
-        /* NAVBAR */
-        .navbar {
-            position: fixed; top: 0; width: 100%; z-index: 1000;
-            background: rgba(255,255,255,0.95); backdrop-filter: blur(20px);
-            padding: 1rem 0; box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-        }
-        .nav-container {
-            max-width: 1200px; margin: 0 auto; padding: 0 1.5rem;
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        .logo {
-            font-size: 1.8rem; font-weight: 800;
-            background: linear-gradient(135deg, #2c3e50, #34495e);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-        }
-        .nav-links { display: flex; gap: 2rem; }
-        .nav-link {
-            color: #7f8c8d; text-decoration: none; font-weight: 500;
-            position: relative;
-        }
-        .nav-link::after {
-            content: ""; position: absolute; bottom: -6px; left: 0;
-            width: 0; height: 2px; background: linear-gradient(90deg, #3498db, #9b59b6);
-            transition: width 0.3s ease;
-        }
-        .nav-link:hover::after, .nav-link.active::after { width: 100%; }
-        .nav-link:hover, .nav-link.active { color: #2c3e50; }
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-        /* HERO */
-        .hero-section {
-            min-height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex; align-items: center; padding: 140px 0 80px; color: white;
-            opacity: 0; transform: translateY(20px); transition: all 0.8s ease;
-        }
-        .hero-content {
-            max-width: 1200px; margin: 0 auto; padding: 0 1.5rem;
-            display: grid; grid-template-columns: 1fr 1fr; gap: 4rem;
-        }
-        .hero-text h1 {
-            font-size: clamp(3rem, 8vw, 5rem); font-weight: 800;
-            line-height: 1.1; margin-bottom: 1.5rem;
-        }
-        .hero-price {
-            font-size: clamp(4rem, 10vw, 6rem); font-weight: 900;
-            background: linear-gradient(45deg, #f39c12, #e67e22);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            margin-bottom: 1.5rem;
-        }
-        .hero-text p { font-size: 1.4rem; opacity: 0.9; margin-bottom: 2rem; }
-        .hero-badges {
-            list-style: none; display: flex; flex-wrap: wrap; gap: 0.75rem; margin: 1.5rem 0 3rem 0;
-        }
-        .hero-badges li {
-            background: rgba(0,0,0,0.2); border-radius: 20px;
-            padding: 0.5rem 1rem; font-size: 0.9rem;
-        }
-        .hero-cta {
-            display: inline-block; background: rgba(255,255,255,0.95);
-            color: #2c3e50; padding: 1.5rem 3rem; border-radius: 50px;
-            font-size: 1.2rem; font-weight: 700; text-decoration: none;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-        }
-        .hero-cta:hover {
-            transform: translateY(-5px); box-shadow: 0 30px 60px rgba(0,0,0,0.4);
-        }
+<style>
+/* ================= BASE ================= */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    font-family: 'Inter', sans-serif;
+    background: #f8f9fa;
+    color: #2c3e50;
+    overflow-x: hidden;
+}
+.container { max-width: 1200px; margin: auto; padding: 0 1.5rem; }
 
-        /* BENEFITS */
-        .benefits-section.animate { padding: 100px 0; background: rgba(255,255,255,0.1); }
-        .benefits-section h2 {
-            text-align: center; font-size: 2.5rem; margin-bottom: 4rem; color: white;
-        }
-        .benefits-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;
-        }
-        .benefit-item {
-            background: rgba(255,255,255,0.15); padding: 2.5rem; border-radius: 24px;
-            backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2);
-        }
-        .benefit-item:hover { transform: translateY(-8px); background: rgba(255,255,255,0.25); }
-        .benefit-item h3 { font-size: 1.5rem; margin-bottom: 1rem; color: white; }
+/* ================= ANIMATIONS ================= */
+.animate { opacity: 0; transform: translateY(40px); }
+.animate.show { opacity: 1; transform: translateY(0); transition: 0.8s cubic-bezier(.25,.46,.45,.94); }
 
-        /* FEATURES */
-        .features-section { padding: 120px 0; background: #f8f9fa; }
-        .features-section h2 {
-            text-align: center; font-size: clamp(2.5rem, 5vw, 4rem);
-            font-weight: 700; margin-bottom: 5rem;
-        }
-        .features-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2rem;
-        }
-        .feature-card {
-            background: white; padding: 3rem 2.5rem; border-radius: 24px;
-            text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.08);
-            border: 1px solid rgba(0,0,0,0.05);
-        }
-        .feature-card:hover {
-            transform: translateY(-12px) scale(1.02);
-            box-shadow: 0 25px 60px rgba(0,0,0,0.15);
-        }
-        .feature-icon { font-size: 4rem; margin-bottom: 1.5rem; }
-        .feature-card h3 { font-size: 1.6rem; margin-bottom: 1rem; }
+/* ================= NAVBAR ================= */
+.navbar {
+    position: fixed; top: 0; width: 100%;
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(20px);
+    box-shadow: 0 4px 20px rgba(0,0,0,.1);
+    z-index: 1000;
+}
+.nav-container {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 1rem 1.5rem;
+}
+.logo {
+    font-size: 1.8rem; font-weight: 900;
+    background: linear-gradient(135deg,#3498db,#9b59b6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+.nav-links a {
+    margin-left: 2rem;
+    text-decoration: none;
+    color: #7f8c8d;
+    font-weight: 600;
+}
+.nav-links a.active, .nav-links a:hover { color: #2c3e50; }
 
-        /* ORDER FORM */
-        .order-section { padding: 120px 0 160px; }
-        .section-title {
-            text-align: center; font-size: clamp(2.5rem, 5vw, 4rem);
-            font-weight: 700; margin-bottom: 4rem;
-        }
-        .order-form {
-            max-width: 1000px; margin: 0 auto; background: white;
-            padding: 4rem; border-radius: 24px; box-shadow: 0 20px 60px rgba(0,0,0,0.1);
-        }
-        .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem; }
-        .input-group label { font-weight: 600; margin-bottom: 0.75rem; display: block; }
-        .input-group input {
-            width: 100%; padding: 1.25rem 1.5rem; border: 2px solid #ecf0f1;
-            border-radius: 16px; font-size: 1rem;
-        }
-        .input-group input:focus {
-            outline: none; border-color: #3498db; box-shadow: 0 0 0 4px rgba(52,152,219,0.1);
-        }
-        .quantity-section { text-align: center; margin: 2rem 0; }
-        .quantity-buttons {
-            display: flex; align-items: center; justify-content: center;
-            gap: 1.5rem; margin-top: 1rem;
-        }
-        .qty-btn {
-            width: 56px; height: 56px; border: 2px solid #bdc3c7;
-            background: white; border-radius: 16px; font-size: 1.8rem;
-            font-weight: 700; cursor: pointer;
-        }
-        .qty-btn:hover { background: #3498db; color: white; border-color: #3498db; transform: scale(1.05); }
-        #quantity {
-            width: 80px; height: 56px; border: 2px solid #bdc3c7;
-            border-radius: 16px; text-align: center; font-size: 1.8rem; font-weight: 700;
-        }
-        .photo-section { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; margin: 4rem 0; }
-        .photo-upload-area {
-            height: 320px; position: relative; border: 3px dashed #bdc3c7;
-            border-radius: 24px; display: flex; flex-direction: column;
-            align-items: center; justify-content: center; background: #f8f9fa;
-            cursor: pointer;
-        }
-        .photo-upload-area:hover {
-            border-color: #3498db; box-shadow: 0 14px 30px rgba(52,152,219,0.25);
-            transform: translateY(-4px); background: #eaf3ff;
-        }
-        .photo-upload-area.uploaded { border-color: #27ae60; background: #eafaf1; }
-        .upload-icon { font-size: 4rem; margin-bottom: 1rem; }
-        .photo-preview {
-            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            width: 100%; height: 100%; object-fit: cover; border-radius: 24px;
-            display: none;
-        }
-        .photo-upload-area.uploaded .photo-preview { display: block; }
-        .upload-status {
-            position: absolute; bottom: 1rem; left: 50%; transform: translateX(-50%);
-            background: rgba(39,174,96,0.9); color: white; padding: 0.5rem 1.5rem;
-            border-radius: 20px; font-weight: 600; display: none;
-        }
-        .photo-upload-area.uploaded .upload-status { display: block; }
-        .pricing-section {
-            background: #f8f9fa; padding: 2.5rem; border-radius: 20px; margin: 3rem 0;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
-        }
-        .price-row {
-            display: flex; justify-content: space-between; padding: 1.25rem 0; font-size: 1.1rem;
-        }
-        .price-row.total {
-            border-top: 3px solid #3498db; font-size: 1.5rem; font-weight: 800;
-            padding: 2rem 0 1.25rem 0 !important;
-        }
-        .order-btn {
-            width: 100%; background: linear-gradient(135deg, #3498db, #2980b9);
-            color: white; border: none; padding: 1.75rem; border-radius: 20px;
-            font-size: 1.4rem; font-weight: 700; cursor: pointer;
-            box-shadow: 0 15px 35px rgba(52,152,219,0.3);
-        }
-        .order-btn:hover:not(:disabled) {
-            transform: translateY(-5px); box-shadow: 0 25px 50px rgba(52,152,219,0.4);
-        }
-        .order-btn:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
-        .loader {
-            display: inline-block; width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.3);
-            border-radius: 50%; border-top-color: white; animation: spin 1s ease-in-out infinite;
-            margin-left: 10px; display: none;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
+/* ================= HERO ================= */
+.hero {
+    min-height: 100vh;
+    background: linear-gradient(135deg,#667eea,#764ba2);
+    color: white;
+    display: flex;
+    align-items: center;
+    padding-top: 120px;
+}
+.hero h1 { font-size: clamp(3rem,7vw,5rem); font-weight: 900; }
+.hero .price {
+    font-size: 5rem;
+    background: linear-gradient(45deg,#f39c12,#e67e22);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 900;
+}
+.hero p { font-size: 1.3rem; margin: 1.5rem 0; }
+.hero a {
+    display: inline-block;
+    background: white;
+    color: #2c3e50;
+    padding: 1.2rem 2.5rem;
+    border-radius: 50px;
+    font-weight: 700;
+    text-decoration: none;
+}
 
-        /* RECEIPT */
-        .receipt-modal {
-            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8);
-            z-index: 2000; align-items: center; justify-content: center; padding: 2rem;
-        }
-        .receipt-card {
-            background: white; border-radius: 28px; max-width: 700px; width: 100%;
-            max-height: 90vh; overflow-y: auto; box-shadow: 0 30px 80px rgba(0,0,0,0.4);
-        }
-        .receipt-top {
-            background: linear-gradient(135deg, #3498db, #2980b9); color: white;
-            padding: 3rem 2.5rem 2rem; text-align: center; border-radius: 28px 28px 0 0;
-        }
-        .receipt-top h1 { font-size: 2.8rem; font-weight: 800; margin-bottom: 0.5rem; }
-        .receipt-content { padding: 3rem 2.5rem; }
-        .receipt-content h3 { font-size: 1.4rem; margin-bottom: 1.5rem; color: #2c3e50; }
-        .info-line, .order-item {
-            display: flex; justify-content: space-between; padding: 1rem 0;
-            border-bottom: 1px solid #ecf0f1;
-        }
-        .order-total {
-            border-top: 3px solid #3498db; padding-top: 1.5rem !important;
-            font-size: 1.4rem; font-weight: 800;
-        }
-        .price-right { font-weight: 700; color: #27ae60; }
-        .receipt-actions {
-            padding: 2.5rem; display: flex; gap: 1.5rem; border-top: 1px solid #ecf0f1;
-        }
-        .pdf-btn, .close-btn {
-            flex: 1; padding: 1.25rem 2rem; border-radius: 16px; font-weight: 700;
-            cursor: pointer; transition: all 0.3s; border: none;
-        }
-        .pdf-btn { background: linear-gradient(135deg, #27ae60, #2ecc71); color: white; }
-        .pdf-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(39,174,96,0.4); }
-        .close-btn { background: #ecf0f1; color: #2c3e50; }
-        .close-btn:hover { transform: translateY(-2px); background: #d5dbdb; }
+/* ================= SECTIONS ================= */
+.section { padding: 120px 0; }
+.section h2 {
+    text-align: center;
+    font-size: clamp(2.5rem,5vw,4rem);
+    margin-bottom: 4rem;
+}
 
-        @media (max-width: 768px) {
-            .input-row, .photo-section { grid-template-columns: 1fr; }
-            .hero-content { grid-template-columns: 1fr; text-align: center; gap: 3rem; }
-            .order-form { padding: 2rem 1.5rem; margin: 1rem; }
-        }
-    </style>
+/* ================= FEATURES ================= */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(280px,1fr));
+    gap: 2rem;
+}
+.card {
+    background: white;
+    padding: 2.5rem;
+    border-radius: 24px;
+    box-shadow: 0 15px 40px rgba(0,0,0,.08);
+    text-align: center;
+}
+.card:hover { transform: translateY(-10px); }
+
+/* ================= ORDER FORM ================= */
+form {
+    max-width: 900px;
+    margin: auto;
+    background: white;
+    padding: 3rem;
+    border-radius: 24px;
+    box-shadow: 0 20px 60px rgba(0,0,0,.1);
+}
+.input-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+input {
+    width: 100%;
+    padding: 1rem;
+    border-radius: 14px;
+    border: 2px solid #ecf0f1;
+    font-size: 1rem;
+}
+input:focus { border-color: #3498db; outline: none; }
+
+.qty-controls {
+    display: flex; justify-content: center; align-items: center; gap: 1rem;
+    margin: 2rem 0;
+}
+.qty-controls button {
+    width: 50px; height: 50px;
+    border-radius: 14px;
+    border: 2px solid #bdc3c7;
+    background: white;
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+#quantity { width: 80px; text-align: center; font-size: 1.5rem; }
+
+.upload-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin: 3rem 0;
+}
+.upload-box {
+    border: 3px dashed #bdc3c7;
+    border-radius: 24px;
+    height: 280px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    cursor: pointer;
+    position: relative;
+}
+.upload-box img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 24px;
+    display: none;
+}
+.upload-box.uploaded img { display: block; }
+
+.price-box {
+    background: #f8f9fa;
+    padding: 2rem;
+    border-radius: 20px;
+}
+.price-row {
+    display: flex;
+    justify-content: space-between;
+    margin: 1rem 0;
+}
+.price-row.total {
+    font-size: 1.4rem;
+    font-weight: 800;
+    border-top: 3px solid #3498db;
+    padding-top: 1.5rem;
+}
+
+button.submit {
+    width: 100%;
+    background: linear-gradient(135deg,#3498db,#2980b9);
+    color: white;
+    padding: 1.5rem;
+    font-size: 1.3rem;
+    font-weight: 800;
+    border-radius: 20px;
+    border: none;
+    margin-top: 2rem;
+    cursor: pointer;
+}
+
+/* ================= RECEIPT ================= */
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.8);
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+.receipt {
+    background: white;
+    border-radius: 28px;
+    max-width: 600px;
+    width: 100%;
+    padding: 2.5rem;
+}
+.receipt h3 { margin-bottom: 1rem; }
+.receipt button {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    width: 100%;
+    border-radius: 14px;
+    font-weight: 700;
+}
+@media (max-width: 768px) {
+    .input-row,.upload-grid { grid-template-columns: 1fr; }
+}
+</style>
 </head>
+
 <body>
-    <!-- SUPABASE/EMAILJS CONFIG -->
-    <script>
-        window.SUPABASE_URL = "https://pkzvftleoysldqmjdgds.supabase.co";
-        window.SUPABASE_ANON_KEY = "sb_publishable_H9QIgdBqQZtHXcywZyDsjA_s4fXffjN";
-        window.EMAILJS_PUBLIC_KEY = "wFE7Ll5cDKSxM4Zfs";
-        window.EMAILJS_SERVICE_ID = "service_zlh57wd";
-        window.EMAILJS_TEMPLATE_CUSTOMER = "template_hu5h00o";
-        window.EMAILJS_TEMPLATE_ADMIN = "template_i0rlm7u";
-    </script>
 
-    <nav class="navbar animate">
-        <div class="nav-container">
-            <div class="logo">KeyCraft</div>
-            <div class="nav-links">
-                <a href="#hero" class="nav-link active">Product</a>
-                <a href="#features" class="nav-link">Features</a>
-                <a href="#order" class="nav-link">Order</a>
-            </div>
+<!-- ================= CONFIG ================= -->
+<script>
+const SUPABASE_URL = "https://pkzvftleoysldqmjdgds.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_H9QIgdBqQZtHXcywZyDsjA_s4fXffjN";
+const EMAILJS_PUBLIC_KEY = "wFE7Ll5cDKSxM4Zfs";
+const EMAILJS_SERVICE_ID = "service_zlh57wd";
+const EMAILJS_TEMPLATE_CUSTOMER = "template_hu5h00o";
+const EMAILJS_TEMPLATE_ADMIN = "template_i0rlm7u";
+
+const PROMO_CODES = { SUMMER20:0.2, STUDENT10:0.1, FIRSTORDER:0.15, IGCSE:0.25 };
+
+const supabase = supabaseJs.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+emailjs.init(EMAILJS_PUBLIC_KEY);
+</script>
+
+<!-- ================= CONTENT ================= -->
+<nav class="navbar">
+    <div class="nav-container">
+        <div class="logo">KeyCraft</div>
+        <div class="nav-links">
+            <a href="#hero" class="active">Product</a>
+            <a href="#order">Order</a>
         </div>
-    </nav>
+    </div>
+</nav>
 
-    <section id="hero" class="hero-section animate">
-        <div class="hero-content">
-            <div class="hero-text animate-item" data-delay="100">
-                <h1>Custom Photo Keychains</h1>
-                <div class="hero-price">4<span>AED</span></div>
-                <p>Turn your favourite photos into everyday mini-memories. Perfect for school bags, car keys, gifts & IGCSE Enterprise stalls.</p>
-                <ul class="hero-badges">
-                    <li>✅ 24hr production in Sharjah</li>
-                    <li>✅ Double-sided full colour</li>
-                    <li>✅ Bulk orders welcome</li>
-                </ul>
-                <a href="#order" class="hero-cta animate-item" data-delay="200">Order Now</a>
-            </div>
-            <div class="animate-item" data-delay="300" style="text-align: center;">
-                <div style="width: 240px; height: 360px; margin: 0 auto; background: rgba(255,255,255,0.2); border-radius: 28px; position: relative; box-shadow: 0 30px 60px rgba(0,0,0,0.3);">
-                    <div style="position: absolute; top: -20px; left: 50%; transform: translateX(-50%); width: 50px; height: 50px; background: linear-gradient(145deg, #bdc3c7, #95a5a6); border-radius: 50%; box-shadow: 0 10px 20px rgba(0,0,0,0.2);"></div>
-                </div>
-            </div>
+<section id="hero" class="hero">
+    <div class="container">
+        <h1>Custom Photo Keychains</h1>
+        <div class="price">4 AED</div>
+        <p>Perfect for school projects, gifts & enterprise stalls.</p>
+        <a href="#order">Order Now</a>
+    </div>
+</section>
+
+<section id="order" class="section">
+<div class="container">
+<h2>Place Your Order</h2>
+
+<form id="orderForm">
+    <div class="input-row">
+        <input id="name" placeholder="Name" required>
+        <input id="email" type="email" placeholder="Email" required>
+    </div>
+
+    <div class="qty-controls">
+        <button type="button" onclick="changeQty(-1)">−</button>
+        <input id="quantity" value="1" readonly>
+        <button type="button" onclick="changeQty(1)">+</button>
+    </div>
+
+    <div class="upload-grid">
+        <div class="upload-box" onclick="front.click()">
+            <input id="front" type="file" hidden>
+            <span>FRONT PHOTO</span>
+            <img id="frontImg">
         </div>
-    </section>
-
-    <section class="benefits-section animate">
-        <div class="container">
-            <h2 class="animate-item">Why students love KeyCraft</h2>
-            <div class="benefits-grid">
-                <div class="benefit-item animate-item" data-delay="100">
-                    <h3>🎯 Personal gifts in minutes</h3>
-                    <p>Snap a photo, upload both sides, get a ready-to-sell keychain design in under a minute.</p>
-                </div>
-                <div class="benefit-item animate-item" data-delay="200">
-                    <h3>🏫 Perfect for school events</h3>
-                    <p>Ideal for IGCSE Enterprise projects, fairs & charity days – simple pricing, fast production.</p>
-                </div>
-                <div class="benefit-item animate-item" data-delay="300">
-                    <h3>💰 Small price, big profit</h3>
-                    <p>Just 4 AED each = premium feel + solid margins for your school projects.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="features" class="features-section animate">
-        <div class="container">
-            <h2 class="animate-item">What makes us different</h2>
-            <div class="features-grid">
-                <div class="feature-card animate-item" data-delay="100">
-                    <div class="feature-icon">🎨</div>
-                    <h3>Double-Sided Printing</h3>
-                    <p>Two memories in one keychain – full colour photos on front AND back.</p>
-                </div>
-                <div class="feature-card animate-item" data-delay="200">
-                    <div class="feature-icon">⚡</div>
-                    <h3>24hr Sharjah Production</h3>
-                    <p>Ready same/next day for school events and urgent orders.</p>
-                </div>
-                <div class="feature-card animate-item" data-delay="300">
-                    <div class="feature-icon">💎</div>
-                    <h3>Premium Build Quality</h3>
-                    <p>Thick 4mm acrylic + solid metal ring = survives bags, keys, daily use.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="order" class="order-section animate">
-        <div class="container">
-            <h2 class="section-title animate-item">Place Your Order</h2>
-            <form id="orderForm" class="order-form animate-item">
-                <div class="input-row">
-                    <div class="input-group">
-                        <label>Name *</label>
-                        <input type="text" id="customerName" required>
-                    </div>
-                    <div class="input-group">
-                        <label>Email *</label>
-                        <input type="email" id="customerEmail" required>
-                    </div>
-                </div>
-                <div class="input-row">
-                    <div class="input-group">
-                        <label>Phone</label>
-                        <input type="tel" id="phone">
-                    </div>
-                    <div class="input-group">
-                        <label>Promo Code</label>
-                        <input type="text" id="promoCode" placeholder="SUMMER20 IGCSE">
-                    </div>
-                </div>
-                <div class="quantity-section">
-                    <label>Quantity (1-10)</label>
-                    <div class="quantity-buttons">
-                        <button type="button" class="qty-btn" id="qtyMinus">-</button>
-                        <input type="number" id="quantity" value="1" min="1" max="10" readonly>
-                        <button type="button" class="qty-btn" id="qtyPlus">+</button>
-                    </div>
-                </div>
-                <div class="photo-section">
-                    <div class="photo-upload-area" id="frontUpload">
-                        <input type="file" id="frontPhoto" accept="image/*" style="position: absolute; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 10;">
-                        <div class="upload-icon">📷</div>
-                        <h3>FRONT PHOTO</h3>
-                        <p>Click anywhere to upload</p>
-                        <img id="frontPreview" class="photo-preview">
-                        <div class="upload-status" id="frontStatus"></div>
-                    </div>
-                    <div class="photo-upload-area" id="backUpload">
-                        <input type="file" id="backPhoto" accept="image/*" style="position: absolute; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 10;">
-                        <div class="upload-icon">📷</div>
-                        <h3>BACK PHOTO</h3>
-                        <p>Click anywhere to upload</p>
-                        <img id="backPreview" class="photo-preview">
-                        <div class="upload-status" id="backStatus"></div>
-                    </div>
-                </div>
-                <div class="pricing-section">
-                    <div class="price-row">
-                        <span>Subtotal (<span id="qtyDisplay">1</span> × 4 AED)</span>
-                        <span id="subtotal">4.00 AED</span>
-                    </div>
-                    <div class="price-row discount" id="discountRow" style="display: none;">
-                        <span>Discount</span>
-                        <span id="discount">0.00 AED</span>
-                    </div>
-                    <div class="price-row total">
-                        <span>TOTAL</span>
-                        <span id="total">4.00 AED</span>
-                    </div>
-                </div>
-                <button type="submit" class="order-btn" id="submitBtn">
-                    <span>Place Order</span>
-                    <div class="loader"></div>
-                </button>
-            </form>
-        </div>
-    </section>
-
-    <div id="receiptModal" class="receipt-modal">
-        <div class="receipt-card">
-            <div class="receipt-top">
-                <h1>KeyCraft</h1>
-                <div class="order-id" id="orderId">#1001</div>
-            </div>
-            <div class="receipt-content">
-                <div class="customer-section">
-                    <h3>Customer Details</h3>
-                    <div class="info-line">
-                        <span>Name:</span>
-                        <span id="receiptCustomer"></span>
-                    </div>
-                    <div class="info-line">
-                        <span>Email:</span>
-                        <span id="receiptEmail"></span>
-                    </div>
-                    <div class="info-line">
-                        <span>Phone:</span>
-                        <span id="receiptPhone"></span>
-                    </div>
-                </div>
-                <div class="order-section">
-                    <h3>Order Summary</h3>
-                    <div class="order-item">
-                        <div>Custom Keychains × <span id="receiptQty">1</span></div>
-                        <div class="price-right" id="receiptSubtotal">4.00 AED</div>
-                    </div>
-                    <div class="order-item discount" id="receiptDiscountRow" style="display: none;">
-                        <div>Discount</div>
-                        <div class="price-right" id="receiptDiscount">0.00 AED</div>
-                    </div>
-                    <div class="order-total">
-                        <div>TOTAL</div>
-                        <div class="price-right" id="receiptTotal">4.00 AED</div>
-                    </div>
-                </div>
-                <div class="photos-section">
-                    <h3>Photo Preview</h3>
-                    <div class="photo-grid">
-                        <div class="photo-cell">
-                            <div class="photo-label">FRONT</div>
-                            <img id="receiptFront">
-                        </div>
-                        <div class="photo-cell">
-                            <div class="photo-label">BACK</div>
-                            <img id="receiptBack">
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="receipt-actions">
-                <button class="pdf-btn" onclick="downloadPDF()">📄 Download PDF</button>
-                <button class="close-btn" onclick="closeModal()">New Order</button>
-            </div>
+        <div class="upload-box" onclick="back.click()">
+            <input id="back" type="file" hidden>
+            <span>BACK PHOTO</span>
+            <img id="backImg">
         </div>
     </div>
 
-    <script>
-        // Wait for libraries to load
-        window.addEventListener('load', async function() {
-            document.body.classList.add('loaded');
-            
-            // Initialize EmailJS
-            emailjs.init(window.EMAILJS_PUBLIC_KEY);
-            
-            // Initialize Supabase
-            const { createClient } = supabase;
-            window.supabase = createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+    <div class="price-box">
+        <div class="price-row"><span>Subtotal</span><span id="subtotal">4 AED</span></div>
+        <div class="price-row total"><span>Total</span><span id="total">4 AED</span></div>
+    </div>
 
-            // Scroll animations
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('show');
-                        observer.unobserve(entry.target);
-                    }
-                });
-            }, { threshold: 0.15 });
-            document.querySelectorAll('.animate, .animate-item').forEach(el => observer.observe(el));
+    <button class="submit">Place Order</button>
+</form>
+</div>
+</section>
 
-            // Navigation
-            document.querySelectorAll('.nav-link').forEach(link => {
-                link.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    const targetId = link.getAttribute('href').substring(1);
-                    document.getElementById(targetId).scrollIntoView({ behavior: 'smooth' });
-                    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-                    link.classList.add('active');
-                });
-            });
+<div class="modal" id="modal">
+<div class="receipt">
+<h3>Order Complete 🎉</h3>
+<p id="receiptText"></p>
+<button onclick="downloadPDF()">Download PDF</button>
+<button onclick="location.reload()">New Order</button>
+</div>
+</div>
 
-            // App functionality
-            initApp();
-        });
+<script>
+let qty = 1, frontFile=null, backFile=null, orderId=null;
 
-        function initApp() {
-            let frontPhotoFile = null, backPhotoFile = null, currentOrderId = null;
-            const PROMO_CODES = {'SUMMER20': 0.20, 'STUDENT10': 0.10, 'FIRSTORDER': 0.15, 'IGCSE': 0.25};
+function changeQty(v){
+    qty = Math.min(10,Math.max(1,qty+v));
+    quantity.value = qty;
+    subtotal.textContent = `${qty*4} AED`;
+    total.textContent = `${qty*4} AED`;
+}
 
-            // Quantity controls
-            document.getElementById('qtyMinus').onclick = () => {
-                let qty = parseInt(document.getElementById('quantity').value);
-                if (qty > 1) {
-                    document.getElementById('quantity').value = qty - 1;
-                    document.getElementById('qtyDisplay').textContent = qty - 1;
-                    updatePricing();
-                }
-            };
-            document.getElementById('qtyPlus').onclick = () => {
-                let qty = parseInt(document.getElementById('quantity').value);
-                if (qty < 10) {
-                    document.getElementById('quantity').value = qty + 1;
-                    document.getElementById('qtyDisplay').textContent = qty + 1;
-                    updatePricing();
-                }
-            };
+front.onchange = e => { frontFile=e.target.files[0]; frontImg.src=URL.createObjectURL(frontFile); frontImg.style.display="block"; front.parentElement.classList.add("uploaded"); }
+back.onchange  = e => { backFile=e.target.files[0]; backImg.src=URL.createObjectURL(backFile); backImg.style.display="block"; back.parentElement.classList.add("uploaded"); }
 
-            // Photo uploads
-            setupPhotoUpload('frontUpload', 'frontPhoto', 'frontPreview', 'frontStatus', (file) => frontPhotoFile = file);
-            setupPhotoUpload('backUpload', 'backPhoto', 'backPreview', 'backStatus', (file) => backPhotoFile = file);
+orderForm.onsubmit = async e => {
+e.preventDefault();
+if(!frontFile||!backFile) return alert("Upload both photos");
 
-            // Form handling
-            document.getElementById('orderForm').onsubmit = handleOrder;
-            document.getElementById('promoCode').oninput = updatePricing;
-            updatePricing();
+const ts = Date.now();
+await supabase.storage.from("order-photos").upload(`front_${ts}.jpg`,frontFile,{upsert:true});
+await supabase.storage.from("order-photos").upload(`back_${ts}.jpg`,backFile,{upsert:true});
 
-            window.frontPhotoFile = () => frontPhotoFile;
-            window.backPhotoFile = () => backPhotoFile;
-            window.currentOrderId = () => currentOrderId;
+const {data} = await supabase.from("orders").insert([{
+    customer_name:name.value,
+    customer_email:email.value,
+    quantity:qty,
+    total_price_aed:qty*4
+}]).select("id").single();
 
-            function setupPhotoUpload(containerId, inputId, previewId, statusId, fileCallback) {
-                const container = document.getElementById(containerId);
-                const input = document.getElementById(inputId);
-                input.onchange = function(e) {
-                    const file = e.target.files[0];
-                    if (file && file.type.startsWith('image/')) {
-                        const reader = new FileReader();
-                        reader.onload = function(ev) {
-                            document.getElementById(previewId).src = ev.target.result;
-                            container.classList.add('uploaded');
-                            document.getElementById(statusId).textContent = '✅ Photo uploaded';
-                            fileCallback(file);
-                        };
-                        reader.readAsDataURL(file);
-                    }
-                };
-            }
+orderId=data.id;
 
-            function updatePricing() {
-                const qty = parseInt(document.getElementById('quantity').value);
-                const promo = document.getElementById('promoCode').value.toUpperCase().trim();
-                document.getElementById('qtyDisplay').textContent = qty;
-                const subtotal = qty * 4;
-                let discount = PROMO_CODES[promo] ? subtotal * PROMO_CODES[promo] : 0;
-                
-                document.getElementById('subtotal').textContent = `${subtotal.toFixed(2)} AED`;
-                if (discount > 0) {
-                    document.getElementById('discountRow').style.display = 'flex';
-                    document.getElementById('discount').textContent = `-${discount.toFixed(2)} AED`;
-                } else {
-                    document.getElementById('discountRow').style.display = 'none';
-                }
-                document.getElementById('total').textContent = `${(subtotal - discount).toFixed(2)} AED`;
-            }
+await emailjs.send(EMAILJS_SERVICE_ID,EMAILJS_TEMPLATE_CUSTOMER,{order_id:orderId});
+await emailjs.send(EMAILJS_SERVICE_ID,EMAILJS_TEMPLATE_ADMIN,{order_id:orderId});
 
-            async function handleOrder(e) {
-                e.preventDefault();
-                const formData = {
-                    name: document.getElementById('customerName').value.trim(),
-                    email: document.getElementById('customerEmail').value.trim(),
-                    phone: document.getElementById('phone').value.trim(),
-                    quantity: parseInt(document.getElementById('quantity').value),
-                    promoCode: document.getElementById('promoCode').value.toUpperCase().trim()
-                };
+receiptText.textContent=`Order #${orderId} placed successfully.`;
+modal.style.display="flex";
+}
 
-                if (!formData.name || !formData.email || !frontPhotoFile() || !backPhotoFile()) {
-                    alert('Please fill all required fields and upload both photos');
-                    return;
-                }
+async function downloadPDF(){
+const {jsPDF}=window.jspdf;
+const pdf=new jsPDF();
+const canvas=await html2canvas(document.querySelector(".receipt"));
+pdf.addImage(canvas.toDataURL(),"PNG",10,10,190,0);
+pdf.save(`KeyCraft-${orderId}.pdf`);
+}
+</script>
 
-                const submitBtn = document.getElementById('submitBtn');
-                const btnText = submitBtn.querySelector('span');
-                const loader = submitBtn.querySelector('.loader');
-                
-                submitBtn.disabled = true;
-                loader.style.display = 'inline-block';
-                btnText.innerHTML = 'Processing...';
-
-                try {
-                    // Upload photos to Supabase
-                    const timestamp = Date.now();
-                    const frontPath = `order_${timestamp}_front.jpg`;
-                    const backPath = `order_${timestamp}_back.jpg`;
-
-                    const frontUpload = await window.supabase.storage
-                        .from('order-photos')
-                        .upload(frontPath, frontPhotoFile(), { upsert: true });
-
-                    const backUpload = await window.supabase.storage
-                        .from('order-photos')
-                        .upload(backPath, backPhotoFile(), { upsert: true });
-
-                    if (frontUpload.error || backUpload.error) {
-                        throw new Error('Photo upload failed');
-                    }
-
-                    // Calculate pricing
-                    const subtotal = formData.quantity * 4;
-                    const discountAmount = PROMO_CODES[formData.promoCode] ? subtotal * PROMO_CODES[formData.promoCode] : 0;
-                    const totalPrice = subtotal - discountAmount;
-
-                    // Save to database
-                    const { data: order, error } = await window.supabase
-                        .from('orders')
-                        .insert([{
-                            customer_name: formData.name,
-                            customer_email: formData.email,
-                            phone: formData.phone || null,
-                            quantity: formData.quantity,
-                            promo_code: formData.promoCode || null,
-                            subtotal: subtotal,
-                            discount_amount: discountAmount,
-                            total_price_aed: totalPrice,
-                            front_photo_path: frontPath,
-                            back_photo_path: backPath,
-                            status: 'pending'
-                        }])
-                        .select('id')
-                        .single();
-
-                    if (error) throw error;
-
-                    currentOrderId = order.id;
-
-                    // Send emails
-                    await emailjs.send(window.EMAILJS_SERVICE_ID, window.EMAILJS_TEMPLATE_CUSTOMER, {
-                        order_id: order.id, customer_name: formData.name,
-                        quantity: formData.quantity, total_price: totalPrice.toFixed(2)
-                    });
-                    await emailjs.send(window.EMAILJS_SERVICE_ID, window.EMAILJS_TEMPLATE_ADMIN, {
-                        order_id: order.id, customer_name: formData.name,
-                        customer_email: formData.email, phone: formData.phone || 'N/A',
-                        quantity: formData.quantity, total_price: totalPrice.toFixed(2)
-                    });
-
-                    // Show receipt
-                    showReceipt(formData, order.id, totalPrice, discountAmount);
-
-                } catch (error) {
-                    console.error('Order error:', error);
-                    alert('Order failed: ' + error.message);
-                } finally {
-                    submitBtn.disabled = false;
-                    loader.style.display = 'none';
-                    btnText.textContent = 'Place Order';
-                }
-            }
-
-            function showReceipt(formData, orderId, totalPrice, discountAmount) {
-                document.getElementById('receiptCustomer').textContent = formData.name;
-                document.getElementById('receiptEmail').textContent = formData.email;
-                document.getElementById('receiptPhone').textContent = formData.phone || 'Not provided';
-                document.getElementById('receiptQty').textContent = formData.quantity;
-                document.getElementById('receiptSubtotal').textContent = (formData.quantity * 4).toFixed(2) + ' AED';
-                
-                if (discountAmount > 0) {
-                    document.getElementById('receiptDiscountRow').style.display = 'flex';
-                    document.getElementById('receiptDiscount').textContent = `-${discountAmount.toFixed(2)} AED`;
-                }
-                
-                document.getElementById('receiptTotal').textContent = totalPrice.toFixed(2) + ' AED';
-                document.getElementById('orderId').textContent = `#${orderId}`;
-                
-                document.getElementById('receiptFront').src = URL.createObjectURL(frontPhotoFile());
-                document.getElementById('receiptBack').src = URL.createObjectURL(backPhotoFile());
-                
-                document.getElementById('receiptModal').style.display = 'flex';
-                document.body.style.overflow = 'hidden';
-            }
-
-            window.downloadPDF = async function() {
-                const receipt = document.querySelector('.receipt-card');
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF();
-                
-                try {
-                    const canvas = await html2canvas(receipt, {
-                        scale: 2, useCORS: true, backgroundColor: '#ffffff'
-                    });
-                    const imgData = canvas.toDataURL('image/png');
-                    doc.addImage(imgData, 'PNG', 10, 10, 190, 277);
-                    doc.save(`KeyCraft-Order-${currentOrderId()}.pdf`);
-                } catch (e) {
-                    alert('PDF failed, please try again');
-                }
-            };
-
-            window.closeModal = function() {
-                document.getElementById('receiptModal').style.display = 'none';
-                document.body.style.overflow = 'auto';
-                document.getElementById('orderForm').reset();
-                document.querySelectorAll('.photo-upload-area').forEach(el => {
-                    el.classList.remove('uploaded');
-                });
-                updatePricing();
-            };
-        }
-    </script>
 </body>
 </html>
