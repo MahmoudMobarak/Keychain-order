@@ -3,70 +3,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KeyCraft | Secure Admin</title>
+    <title>KeyCraft | Admin Order Manager</title>
     
     <script src="admin-config.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     
     <style>
-        :root { --primary: #6366f1; --dark: #0f172a; --bg: #f8fafc; }
+        :root { --primary: #6366f1; --dark: #0f172a; --bg: #f1f5f9; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { background: var(--bg); color: var(--dark); padding: 2rem; }
+        body { background: var(--bg); color: var(--dark); padding: 40px; }
 
+        /* Login Overlay */
         #loginOverlay {
             position: fixed; inset: 0; background: var(--dark);
-            display: flex; align-items: center; justify-content: center; z-index: 1000;
+            display: flex; align-items: center; justify-content: center; z-index: 2000;
         }
-        .login-card { background: white; padding: 3rem; border-radius: 30px; width: 100%; max-width: 400px; text-align: center; }
-        input { width: 100%; padding: 1rem; margin-bottom: 1rem; border-radius: 12px; border: 2px solid #eee; font-size: 1rem; }
-        button { width: 100%; padding: 1.2rem; background: var(--primary); color: white; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; }
+        .login-card { background: white; padding: 3rem; border-radius: 35px; width: 100%; max-width: 400px; text-align: center; }
+        input { width: 100%; padding: 1.2rem; margin-bottom: 1.2rem; border-radius: 15px; border: 2px solid #e2e8f0; font-size: 1.1rem; }
+        .unlock-btn { width: 100%; padding: 1.2rem; background: var(--primary); color: white; border: none; border-radius: 15px; font-weight: 800; cursor: pointer; }
 
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
-        table { width: 100%; border-collapse: collapse; background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
-        th { background: #f1f5f9; padding: 1.2rem; text-align: left; font-size: 0.9rem; color: #64748b; }
-        td { padding: 1.2rem; border-bottom: 1px solid #f1f5f9; }
-        .photo-link { color: var(--primary); text-decoration: none; font-weight: 700; background: #eef2ff; padding: 5px 10px; border-radius: 8px; }
+        /* Dashboard Layout */
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .main-container { display: none; } /* Hidden until login */
+
+        /* Table Design */
+        .table-wrapper { background: white; border-radius: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.05); overflow: hidden; }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #f8fafc; padding: 20px; text-align: left; font-size: 0.85rem; color: #64748b; border-bottom: 2px solid #edf2f7; text-transform: uppercase; letter-spacing: 1px; }
+        td { padding: 20px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+        
+        .cust-info { display: flex; flex-direction: column; }
+        .cust-name { font-weight: 800; font-size: 1.1rem; }
+        .cust-email { color: #64748b; font-size: 0.9rem; }
+
+        /* Download Buttons */
+        .btn-group { display: flex; gap: 10px; }
+        .download-btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 10px 18px; background: #eef2ff; color: var(--primary);
+            text-decoration: none; border-radius: 12px; font-weight: 700;
+            font-size: 0.85rem; border: 1px solid #e0e7ff; transition: 0.2s;
+        }
+        .download-btn:hover { background: var(--primary); color: white; transform: translateY(-2px); }
+        
+        .price-chip { font-weight: 800; color: #059669; background: #ecfdf5; padding: 6px 12px; border-radius: 8px; }
     </style>
 </head>
 <body>
 
     <div id="loginOverlay">
         <div class="login-card">
-            <h2 style="margin-bottom: 1.5rem;">Access Admin</h2>
-            <input type="password" id="adminPass" placeholder="Enter Admin Password">
-            <button onclick="handleLogin()">Unlock Dashboard</button>
-            <p id="errMsg" style="color: red; margin-top: 1rem; display: none;">Wrong Password</p>
+            <h2 style="margin-bottom: 1.5rem; letter-spacing: -1px;">Admin Access</h2>
+            <input type="password" id="adminPass" placeholder="Enter Password">
+            <button class="unlock-btn" onclick="handleLogin()">Unlock Orders</button>
+            <p id="errMsg" style="color: #ef4444; margin-top: 1rem; display: none; font-weight: 600;">Access Denied</p>
         </div>
     </div>
 
-    <div class="header">
-        <h1>Order Dashboard</h1>
-        <button onclick="location.reload()" style="width: auto; padding: 0.6rem 1.5rem; background: #eee; color: #333; border: none; border-radius: 10px; cursor: pointer;">Lock Panel</button>
-    </div>
+    <div class="main-container" id="adminUI">
+        <div class="header">
+            <div>
+                <h1 style="font-size: 2.5rem; letter-spacing: -1.5px;">Active Orders</h1>
+                <p id="orderCount" style="color: #64748b; font-weight: 600;">Loading totals...</p>
+            </div>
+            <button onclick="location.reload()" style="background: white; border: 1px solid #cbd5e1; padding: 10px 20px; border-radius: 12px; cursor: pointer; font-weight: 700;">Lock Panel</button>
+        </div>
 
-    <table id="adminContent" style="display:none;">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Customer</th>
-                <th>Price</th>
-                <th>Photos</th>
-            </tr>
-        </thead>
-        <tbody id="orderTable"></tbody>
-    </table>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Customer Details</th>
+                        <th>Price</th>
+                        <th>Photo Assets</th>
+                        <th>Order Date</th>
+                    </tr>
+                </thead>
+                <tbody id="orderTable">
+                    </tbody>
+            </table>
+        </div>
+    </div>
 
     <script>
         const sb = supabase.createClient(CONFIG.SB_URL, CONFIG.SB_KEY);
 
         function handleLogin() {
-            const typedPassword = document.getElementById('adminPass').value;
-            
-            // Compare the hash of what was typed to the hash in config
-            if (simpleHash(typedPassword) === CONFIG.ADMIN_PASSWORD_HASH) {
+            const typed = document.getElementById('adminPass').value;
+            if (simpleHash(typed) === CONFIG.ADMIN_PASSWORD_HASH) {
                 document.getElementById('loginOverlay').style.display = 'none';
-                document.getElementById('adminContent').style.display = 'table';
+                document.getElementById('adminUI').style.display = 'block';
                 loadOrders();
             } else {
                 document.getElementById('errMsg').style.display = 'block';
@@ -75,23 +103,43 @@
 
         async function loadOrders() {
             const { data: orders, error } = await sb.from('orders').select('*').order('created_at', { ascending: false });
-            if (error) return console.error(error);
+            
+            if (error) {
+                console.error("Database error:", error);
+                return;
+            }
 
             const table = document.getElementById('orderTable');
             table.innerHTML = "";
+            document.getElementById('orderCount').innerText = `${orders.length} orders found in database`;
 
             orders.forEach(order => {
+                // Get URLs from Supabase Storage
                 const fUrl = sb.storage.from('order-photos').getPublicUrl(order.front_photo_path).data.publicUrl;
                 const bUrl = sb.storage.from('order-photos').getPublicUrl(order.back_photo_path).data.publicUrl;
 
                 table.innerHTML += `
                     <tr>
-                        <td>#${order.id}</td>
-                        <td><strong>${order.customer_name}</strong><br><small>${order.customer_email}</small></td>
-                        <td style="color: #10b981; font-weight: 800;">${order.total_price_aed} AED</td>
+                        <td style="color: #94a3b8; font-weight: 600;">#${order.id}</td>
                         <td>
-                            <a href="${fUrl}" target="_blank" class="photo-link">Front</a>
-                            <a href="${bUrl}" target="_blank" class="photo-link">Back</a>
+                            <div class="cust-info">
+                                <span class="cust-name">${order.customer_name}</span>
+                                <span class="cust-email">${order.customer_email} | ${order.phone || 'No Phone'}</span>
+                            </div>
+                        </td>
+                        <td><span class="price-chip">${order.total_price_aed} AED</span></td>
+                        <td>
+                            <div class="btn-group">
+                                <a href="${fUrl}" download="${order.customer_name}_Front" target="_blank" class="download-btn">
+                                    💾 Front
+                                </a>
+                                <a href="${bUrl}" download="${order.customer_name}_Back" target="_blank" class="download-btn">
+                                    💾 Back
+                                </a>
+                            </div>
+                        </td>
+                        <td style="color: #64748b; font-size: 0.9rem;">
+                            ${new Date(order.created_at).toLocaleDateString(undefined, {month: 'short', day: 'numeric', year: 'numeric'})}
                         </td>
                     </tr>
                 `;
