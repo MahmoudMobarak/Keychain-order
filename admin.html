@@ -3,117 +3,145 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Keychain Orders</title>
+    <title>KeyCraft | Admin Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        .admin-container { max-width: 1400px; margin: 2rem auto; padding: 2rem; }
-        .password-form { max-width: 400px; margin: 4rem auto; text-align: center; }
-        .orders-table { width: 100%; border-collapse: collapse; margin-top: 2rem; }
-        .orders-table th, .orders-table td { padding: 1rem; text-align: left; border-bottom: 1px solid #e5e5e7; }
-        .orders-table th { background: #f5f5f7; font-weight: 600; }
-        .download-btn { background: #0071e3; color: white; padding: 0.5rem 1rem; border-radius: 8px; text-decoration: none; }
-        .status { padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
-        .status.confirmed { background: #d4edda; color: #155724; }
-        .hidden { display: none; }
+        :root { --primary: #6366f1; --dark: #0f172a; --bg: #f8fafc; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background: var(--bg); color: var(--dark); padding: 2rem; }
+
+        /* Login Screen */
+        #loginOverlay {
+            position: fixed; inset: 0; background: var(--dark);
+            display: flex; align-items: center; justify-content: center; z-index: 1000;
+        }
+        .login-card { background: white; padding: 3rem; border-radius: 30px; width: 100%; max-width: 400px; text-align: center; }
+        input { width: 100%; padding: 1rem; margin-bottom: 1rem; border-radius: 12px; border: 2px solid #eee; font-size: 1rem; }
+        button { width: 100%; padding: 1rem; background: var(--primary); color: white; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; }
+
+        /* Dashboard */
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 3rem; }
+        .stat-card { background: white; padding: 1.5rem; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .stat-card h3 { font-size: 0.8rem; color: #64748b; text-transform: uppercase; }
+        .stat-card p { font-size: 2rem; font-weight: 800; }
+
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        th { background: #f1f5f9; padding: 1.2rem; text-align: left; font-size: 0.9rem; color: #64748b; }
+        td { padding: 1.2rem; border-bottom: 1px solid #f1f5f9; font-size: 0.95rem; }
+        .badge { padding: 0.4rem 0.8rem; border-radius: 8px; font-size: 0.8rem; font-weight: 700; background: #e0e7ff; color: var(--primary); }
+        .photo-link { color: var(--primary); text-decoration: none; font-weight: 600; }
+        .photo-link:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
-    <div class="admin-container">
-        <h1>🛠️ Admin Panel</h1>
-        
-        <!-- Password Form -->
-        <div id="passwordForm" class="password-form">
-            <h2>Enter Admin Password</h2>
-            <input type="password" id="adminPassword" placeholder="Password" style="width: 100%; padding: 1rem; border: 2px solid #e5e5e7; border-radius: 12px; font-size: 1.1rem;">
-            <button onclick="checkPassword()" class="cta-button" style="margin-top: 1rem; width: 100%;">Login</button>
-        </div>
 
-        <!-- Orders Table -->
-        <div id="ordersTable" class="hidden">
-            <h2>Recent Orders</h2>
-            <table class="orders-table">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Date</th>
-                        <th>Customer</th>
-                        <th>Email</th>
-                        <th>Phone</th>
-                        <th>Quantity</th>
-                        <th>Total (AED)</th>
-                        <th>Promo</th>
-                        <th>Photos</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="ordersBody"></tbody>
-            </table>
+    <div id="loginOverlay">
+        <div class="login-card">
+            <h2 style="margin-bottom: 1.5rem;">Admin Login</h2>
+            <input type="email" id="email" placeholder="Admin Email">
+            <input type="password" id="pass" placeholder="Password">
+            <button onclick="handleLogin()">Sign In</button>
+            <p id="errMsg" style="color: red; margin-top: 1rem; display: none;">Invalid Login</p>
         </div>
     </div>
 
+    <div class="header">
+        <h1>Order Dashboard</h1>
+        <button onclick="handleLogout()" style="width: auto; padding: 0.6rem 1.5rem; background: #ef4444;">Logout</button>
+    </div>
+
+    <div class="stats">
+        <div class="stat-card"><h3>Total Orders</h3><p id="statTotal">0</p></div>
+        <div class="stat-card"><h3>Total Revenue</h3><p id="statRev">0 AED</p></div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Customer</th>
+                <th>Contact</th>
+                <th>Total</th>
+                <th>Photos (F/B)</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody id="orderTable">
+            </tbody>
+    </table>
+
     <script>
-        const SUPABASE_URL = 'YOUR_SUPABASE_URL';
-        const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
-        const ADMIN_PASSWORD = 'YOUR_ADMIN_PASSWORD'; // Same as in .env
+        const SB_URL = "https://pkzvftleoysldqmjdgds.supabase.co";
+        const SB_KEY = "sb_publishable_H9QIgdBqQZtHXcywZyDsjA_s4fXffjN";
+        const sb = supabase.createClient(SB_URL, SB_KEY);
 
-        const { createClient } = supabase;
-        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        async function handleLogin() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('pass').value;
+            const { data, error } = await sb.auth.signInWithPassword({ email, password });
 
-        async function checkPassword() {
-            const password = document.getElementById('adminPassword').value;
-            if (password === ADMIN_PASSWORD) {
-                document.getElementById('passwordForm').classList.add('hidden');
-                document.getElementById('ordersTable').classList.remove('hidden');
-                loadOrders();
+            if (error) {
+                document.getElementById('errMsg').style.display = 'block';
             } else {
-                alert('Incorrect password');
+                document.getElementById('loginOverlay').style.display = 'none';
+                loadOrders();
             }
         }
 
         async function loadOrders() {
-            const { data: orders, error } = await supabase
+            const { data: orders, error } = await sb
                 .from('orders')
                 .select('*')
                 .order('created_at', { ascending: false });
 
-            if (error) {
-                console.error('Error loading orders:', error);
-                return;
-            }
+            if (error) return console.error(error);
 
-            const tbody = document.getElementById('ordersBody');
-            tbody.innerHTML = '';
+            const table = document.getElementById('orderTable');
+            table.innerHTML = "";
+            let totalRev = 0;
 
             orders.forEach(order => {
-                const row = tbody.insertRow();
-                row.innerHTML = `
-                    <td>#${order.id}</td>
-                    <td>${new Date(order.created_at).toLocaleString()}</td>
-                    <td>${order.customer_name}</td>
-                    <td>${order.customer_email}</td>
-                    <td>${order.phone || '-'}</td>
-                    <td>${order.items[0].quantity}</td>
-                    <td>${order.total_price_aed.toFixed(2)}</td>
-                    <td>${order.promo_code || '-'}</td>
-                    <td>
-                        ${order.front_photo_path ? `<a href="${getPublicUrl(order.front_photo_path)}" target="_blank">Front</a>` : '-'}
-                        ${order.back_photo_path ? ` | <a href="${getPublicUrl(order.back_photo_path)}" target="_blank">Back</a>` : ''}
-                    </td>
-                    <td>
-                        <a href="${getPublicUrl(order.front_photo_path)}" download="${order.id}_front.jpg" class="download-btn">Front ↓</a>
-                        <a href="${getPublicUrl(order.back_photo_path)}" download="${order.id}_back.jpg" class="download-btn" style="margin-left: 0.5rem;">Back ↓</a>
-                    </td>
+                totalRev += parseFloat(order.total_price_aed || 0);
+                
+                // Construct photo URLs
+                const fUrl = sb.storage.from('order-photos').getPublicUrl(order.front_photo_path).data.publicUrl;
+                const bUrl = sb.storage.from('order-photos').getPublicUrl(order.back_photo_path).data.publicUrl;
+
+                const row = `
+                    <tr>
+                        <td>#${order.id}</td>
+                        <td><strong>${order.customer_name}</strong></td>
+                        <td>${order.customer_email}<br><small>${order.phone || 'No Phone'}</small></td>
+                        <td><span class="badge">${order.total_price_aed} AED</span></td>
+                        <td>
+                            <a href="${fUrl}" target="_blank" class="photo-link">Front</a> / 
+                            <a href="${bUrl}" target="_blank" class="photo-link">Back</a>
+                        </td>
+                        <td>${new Date(order.created_at).toLocaleDateString()}</td>
+                    </tr>
                 `;
+                table.innerHTML += row;
             });
+
+            document.getElementById('statTotal').innerText = orders.length;
+            document.getElementById('statRev').innerText = totalRev.toFixed(2) + " AED";
         }
 
-        function getPublicUrl(path) {
-            return `https://your-project-id.supabase.co/storage/v1/object/public/order-photos/${path}`;
+        async function handleLogout() {
+            await sb.auth.signOut();
+            location.reload();
         }
 
-        // Auto-refresh every 30 seconds
-        setInterval(loadOrders, 30000);
+        // Auto-check session on load
+        window.onload = async () => {
+            const { data } = await sb.auth.getSession();
+            if (data.session) {
+                document.getElementById('loginOverlay').style.display = 'none';
+                loadOrders();
+            }
+        };
     </script>
 </body>
 </html>
