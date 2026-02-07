@@ -10,57 +10,71 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     
     <style>
-        :root { --primary: #6366f1; --dark: #0f172a; --bg: #f1f5f9; --success: #10b981; }
+        :root { --primary: #6366f1; --dark: #0f172a; --bg: #f1f5f9; --success: #10b981; --danger: #ef4444; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
         body { background: var(--bg); color: var(--dark); padding: 40px; }
 
+        /* Login */
         #loginOverlay { position: fixed; inset: 0; background: var(--dark); display: flex; align-items: center; justify-content: center; z-index: 2000; }
         .login-card { background: white; padding: 3rem; border-radius: 35px; width: 400px; text-align: center; }
         input[type="password"] { width: 100%; padding: 1.2rem; margin-bottom: 1.2rem; border-radius: 15px; border: 2px solid #e2e8f0; font-size: 1.1rem; }
         
+        /* Layout */
         .main-container { display: none; }
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
 
+        /* Table */
         .table-wrapper { background: white; border-radius: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.05); overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; min-width: 1000px; }
+        table { width: 100%; border-collapse: collapse; min-width: 1100px; }
         th { background: #f8fafc; padding: 20px; text-align: left; font-size: 0.8rem; color: #64748b; text-transform: uppercase; border-bottom: 2px solid #edf2f7; }
         td { padding: 20px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
 
-        .promo-tag { background: #e0e7ff; color: #4338ca; padding: 4px 10px; border-radius: 6px; font-weight: 700; font-size: 0.8rem; }
-        .download-btn { padding: 8px 14px; background: #f1f5f9; color: var(--primary); text-decoration: none; border-radius: 10px; font-weight: 700; font-size: 0.8rem; border: 1px solid #e2e8f0; }
+        /* Actions */
+        .promo-tag { background: #fee2e2; color: #dc2626; padding: 4px 10px; border-radius: 6px; font-weight: 700; font-size: 0.8rem; }
+        .download-btn { padding: 8px 14px; background: #f1f5f9; color: var(--primary); text-decoration: none; border-radius: 10px; font-weight: 700; font-size: 0.8rem; border: 1px solid #e2e8f0; margin-right: 5px; }
         
-        /* Completed Row Style */
-        tr.completed-row { opacity: 0.6; background: #f8fafc; }
-        .status-btn { background: var(--success); color: white; border: none; padding: 10px 15px; border-radius: 10px; cursor: pointer; font-weight: 700; }
+        .delete-btn { 
+            padding: 8px 12px; background: #fef2f2; color: var(--danger); 
+            border: 1px solid #fee2e2; border-radius: 10px; cursor: pointer; 
+            font-weight: 700; font-size: 0.8rem; transition: 0.2s;
+        }
+        .delete-btn:hover { background: var(--danger); color: white; }
+
+        tr.completed-row { opacity: 0.4; filter: grayscale(1); background: #f8fafc; }
+        .checkbox-custom { width: 22px; height: 22px; cursor: pointer; accent-color: var(--success); }
     </style>
 </head>
 <body>
 
     <div id="loginOverlay">
         <div class="login-card">
-            <h2>Admin Access</h2>
+            <h2 style="margin-bottom:1.5rem">Admin Access</h2>
             <input type="password" id="adminPass" placeholder="Enter Password">
-            <button onclick="handleLogin()" style="width:100%; padding:1rem; background:var(--primary); color:white; border:none; border-radius:15px; font-weight:800; cursor:pointer;">Unlock</button>
+            <button onclick="handleLogin()" style="width:100%; padding:1rem; background:var(--primary); color:white; border:none; border-radius:15px; font-weight:800; cursor:pointer;">Unlock Panel</button>
         </div>
     </div>
 
     <div class="main-container" id="adminUI">
         <div class="header">
-            <h1>Order History</h1>
-            <button onclick="location.reload()" style="padding:10px 20px; border-radius:10px; border:1px solid #ccc; cursor:pointer;">Lock Panel</button>
+            <div>
+                <h1>KeyCraft Dashboard</h1>
+                <p id="stats" style="color: #64748b; font-weight: 600;">Connecting...</p>
+            </div>
+            <button onclick="location.reload()" style="padding:10px 20px; border-radius:10px; border:1px solid #ccc; cursor:pointer; font-weight:700">Lock</button>
         </div>
 
         <div class="table-wrapper">
             <table>
                 <thead>
                     <tr>
-                        <th>Status</th>
+                        <th>Done</th>
                         <th>ID</th>
                         <th>Customer</th>
-                        <th>Promo/Discount</th>
-                        <th>Final Price</th>
+                        <th>Promo</th>
+                        <th>Price</th>
                         <th>Photos</th>
                         <th>Date</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody id="orderTable"></tbody>
@@ -82,7 +96,7 @@
                 document.getElementById('loginOverlay').style.display = 'none';
                 document.getElementById('adminUI').style.display = 'block';
                 loadOrders();
-            } else { alert("Incorrect Password"); }
+            } else { alert("Access Denied"); }
         }
 
         async function loadOrders() {
@@ -91,49 +105,58 @@
 
             const table = document.getElementById('orderTable');
             table.innerHTML = "";
+            document.getElementById('stats').innerText = `${orders.length} total orders recorded`;
 
             orders.forEach(order => {
-                const isDone = order.is_completed; // Assumes you have 'is_completed' column (boolean)
+                const isDone = order.is_completed; 
                 const fUrl = sb.storage.from('order-photos').getPublicUrl(order.front_photo_path).data.publicUrl;
                 const bUrl = sb.storage.from('order-photos').getPublicUrl(order.back_photo_path).data.publicUrl;
 
                 table.innerHTML += `
                     <tr class="${isDone ? 'completed-row' : ''}">
                         <td>
-                            <input type="checkbox" ${isDone ? 'checked' : ''} 
-                                   onchange="toggleComplete(${order.id}, this.checked)" 
-                                   style="width:20px; height:20px; cursor:pointer;">
+                            <input type="checkbox" class="checkbox-custom" 
+                                   ${isDone ? 'checked' : ''} 
+                                   onchange="toggleStatus(${order.id}, this.checked)">
                         </td>
-                        <td style="font-size:0.8rem; color:#94a3b8;">#${order.id}</td>
+                        <td style="font-family: monospace; color:#64748b;">#${order.id}</td>
                         <td>
-                            <strong>${order.customer_name}</strong><br>
-                            <span style="font-size:0.8rem; color:#64748b;">${order.phone}</span>
+                            <div style="font-weight:700">${order.customer_name}</div>
+                            <div style="font-size:0.8rem; color:#64748b">${order.phone}</div>
                         </td>
-                        <td>
-                            ${order.promo_code ? `<span class="promo-tag">${order.promo_code}</span>` : '<span style="color:#cbd5e1">—</span>'}
-                        </td>
+                        <td>${order.promo_code ? `<span class="promo-tag">${order.promo_code}</span>` : '—'}</td>
                         <td style="font-weight:800; color:#059669;">${order.total_price_aed} AED</td>
                         <td>
                             <a href="${fUrl}" target="_blank" class="download-btn">Front</a>
                             <a href="${bUrl}" target="_blank" class="download-btn">Back</a>
                         </td>
-                        <td style="font-size:0.8rem;">${new Date(order.created_at).toLocaleDateString()}</td>
+                        <td style="font-size:0.8rem; color:#64748b">${new Date(order.created_at).toLocaleDateString()}</td>
+                        <td>
+                            <button class="delete-btn" onclick="deleteOrder(${order.id})">Delete</button>
+                        </td>
                     </tr>
                 `;
             });
         }
 
-        async function toggleComplete(orderId, status) {
-            const { error } = await sb.from('orders')
-                .update({ is_completed: status })
-                .eq('id', orderId);
-            
-            if (error) {
-                alert("Error updating status");
-            } else {
-                loadOrders(); // Refresh list to show fade effect
+        async function toggleStatus(orderId, status) {
+            const { error } = await sb.from('orders').update({ is_completed: status }).eq('id', orderId);
+            if (error) alert("Update failed"); else loadOrders();
+        }
+
+        async function deleteOrder(orderId) {
+            if (confirm("Are you sure? This will permanently delete this order from the database.")) {
+                const { error } = await sb.from('orders').delete().eq('id', orderId);
+                if (error) {
+                    alert("Delete failed. Check Supabase RLS policies.");
+                    console.error(error);
+                } else {
+                    loadOrders();
+                }
             }
         }
+
+        document.getElementById('adminPass').addEventListener('keypress', (e) => { if (e.key === 'Enter') handleLogin(); });
     </script>
 </body>
 </html>
