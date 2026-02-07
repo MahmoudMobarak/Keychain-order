@@ -170,7 +170,7 @@
                     <label>Promo Code</label>
                     <div style="display: flex; gap: 10px;">
                         <input type="text" id="promoInput" placeholder="Enter code (e.g. SCHOOL)" style="text-transform: uppercase;">
-                        <button type="button" onclick="applyPromo()" id="promoBtn" style="padding: 0 20px; border-radius: 15px; background: var(--primary); color: white; border: none; font-weight: 700; cursor: pointer;">Apply</button>
+                        <button type="button" onclick="applyPromo()" id="promoBtn" style="padding: 0 20px; border-radius: 15px; background: var(--primary); color: white; border: none; font-weight: 700; cursor: pointer; min-width: 100px;">Apply</button>
                     </div>
                 </div>
 
@@ -232,8 +232,15 @@
         
         async function applyPromo() {
             const codeInput = document.getElementById('promoInput').value.trim().toUpperCase();
+            const emailInput = document.getElementById('custEmail').value.trim().toLowerCase();
+
+            if(!emailInput || !emailInput.includes('@')) {
+                alert("Please enter a valid email address first to check promo eligibility.");
+                return;
+            }
             if(!codeInput) return;
         
+            // Check if code exists
             const { data: promo, error } = await sb
                 .from('promo_codes')
                 .select('*')
@@ -242,16 +249,46 @@
                 .single();
         
             if (error || !promo) {
-                alert("Invalid code");
-                activePromo = null;
-                discountInfo = { type: null, value: 0 };
-            } else {
-                activePromo = promo.code;
-                discountInfo = { type: promo.discount_type, value: parseFloat(promo.discount_value) };
-                document.getElementById('promoBtn').style.background = "#10b981";
-                document.getElementById('promoBtn').innerText = "Applied!";
+                alert("Invalid or expired code.");
+                return;
             }
+
+            // Check if email already used this code
+            const { data: usage } = await sb
+                .from('used_promos')
+                .select('*')
+                .eq('email', emailInput)
+                .eq('promo_code', codeInput)
+                .maybeSingle();
+
+            if (usage) {
+                alert("This email has already used this promo code.");
+                return;
+            }
+
+            // Apply successful promo
+            activePromo = promo.code;
+            discountInfo = { type: promo.discount_type, value: parseFloat(promo.discount_value) };
+            
+            const pBtn = document.getElementById('promoBtn');
+            pBtn.style.background = "#ef4444"; // Red for Remove
+            pBtn.innerText = "Remove";
+            pBtn.onclick = removePromo;
+            
             updateQty(0); 
+        }
+
+        function removePromo() {
+            activePromo = null;
+            discountInfo = { type: null, value: 0 };
+            
+            const pBtn = document.getElementById('promoBtn');
+            pBtn.style.background = "var(--primary)";
+            pBtn.innerText = "Apply";
+            pBtn.onclick = applyPromo;
+            
+            document.getElementById('promoInput').value = "";
+            updateQty(0);
         }
         
         function updateQty(n) {
@@ -293,6 +330,7 @@
             const btn = document.getElementById('subBtn');
             const rawName = document.getElementById('custName').value || "Guest";
             const safeName = String(rawName).replace(/\s+/g,'_').toLowerCase();
+            const email = document.getElementById('custEmail').value.trim().toLowerCase();
             const finalDisplayPrice = window.currentTotal.toFixed(2);
 
             btn.disabled = true;
@@ -301,7 +339,7 @@
             try {
                 const { data: order, error } = await sb.from('orders').insert([{
                     customer_name: rawName,
-                    customer_email: document.getElementById('custEmail').value,
+                    customer_email: email,
                     phone: document.getElementById('custPhone').value,
                     promo_code: activePromo,
                     discount_amount: window.currentDiscount || 0,
@@ -309,6 +347,11 @@
                 }]).select().single();
 
                 if(error) throw error;
+
+                // Log promo usage
+                if(activePromo) {
+                    await sb.from('used_promos').insert([{ email: email, promo_code: activePromo }]);
+                }
 
                 const fFile = document.getElementById('fFile').files[0];
                 const bFile = document.getElementById('bFile').files[0];
@@ -325,7 +368,7 @@
 
                 await emailjs.send(config.ejs_svc, config.ejs_tmp, {
                     cust_name: rawName,
-                    cust_email: document.getElementById('custEmail').value,
+                    cust_email: email,
                     order_id: order.id,
                     total_price: finalDisplayPrice,
                     quantity: qty,
